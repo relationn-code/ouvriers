@@ -442,7 +442,7 @@ transform: translate(-3px,10px);
   transform: translateY(-47%);
   width: 400px;
   aspect-ratio: 3/4;
-  background: url("images/credits-art.jpg") center/cover no-repeat;
+  background: url("https://res.cloudinary.com/daizpzcxl/image/upload/f_auto,q_auto,dpr_auto,c_limit,w_1400/credits-art.jpg") center/cover no-repeat;
   opacity: .9;
   z-index: 0;
   pointer-events: none;
@@ -1743,14 +1743,14 @@ img, svg {
   <!-- 중앙 슬라이드 -->
 <div class="intro-slider" id="introSlider">
   <button class="circle-btn left" type="button" aria-label="이전">
-<img class="circle-img" src="images/intro-btn-left.png" data-no-cld="1">
+<img class="circle-img" src="images/intro-btn-left.png">
   </button>
 
   <img src="images/intro1.jpg" alt="intro slide"
        class="intro-slide-img" id="introSlideImg" draggable="false">
 
   <button class="circle-btn right" type="button" aria-label="다음">
-<img class="circle-img" src="images/intro-btn-right.png" data-no-cld="1">
+<img class="circle-img" src="images/intro-btn-right.png">
   </button>
 </div>
 
@@ -1758,7 +1758,7 @@ img, svg {
 <a href="#" class="intro-story" id="introStory">
   스토리
   <img src="images/chevron-down.png"
-       alt="" class="intro-story-arrow" data-no-cld="1">
+       alt="" class="intro-story-arrow">
 </a>
 </section>
 
@@ -1772,7 +1772,7 @@ img, svg {
 
     <!-- 타이틀 -->
 <h2 class="story-title">
-  <img src="images/story-title.png" alt="Ouvriers" class="story-title-img" data-no-cld="1">
+  <img src="images/story-title.png" alt="Ouvriers" class="story-title-img">
 </h2>
 
     <!-- 짤막한 글 -->
@@ -1784,7 +1784,7 @@ img, svg {
     <!-- 사진 배너 -->
 <figure class="story-banner">
 <img
-  src="images/story-banner.jpg" data-no-cld="1"
+  src="images/story-banner.jpg"
   alt="Les Ouvriers 컬렉션 배너"
   loading="eager" fetchpriority="high" decoding="async"
   width="1600" height="900">
@@ -1825,8 +1825,8 @@ img, svg {
       <div class="view-all" id="view-all">❮</div>
 <div class="image-container">
   <div class="look-stack" id="lookStack">
-<img class="look-img is-visible" id="lookImgA" src="images/look1.jpg" alt="Look Image A" decoding="async" fetchpriority="high" data-no-cld="1">
-<img class="look-img" id="lookImgB" alt="Look Image B" decoding="async" data-no-cld="1">
+<img class="look-img is-visible" id="lookImgA" src="images/look1.jpg" alt="Look Image A" decoding="async" fetchpriority="high">
+<img class="look-img" id="lookImgB" alt="Look Image B" decoding="async">
 <div class="look-blackout" id="lookBlackout"></div>
   </div>
 </div>
@@ -5096,6 +5096,9 @@ async function primeLookEntry(n){
   imgA.src = src;
   imgB.src = src;
 
+  tryCloudinary(imgA);
+  tryCloudinary(imgB);
+
   imgA.style.visibility = 'visible';
   imgA.style.opacity = '1';
   imgA.classList.add('is-visible');
@@ -5238,6 +5241,7 @@ async function swapLookImage(nextSrc){
       // 실제 소스 교체
       show.src = srcToShow;
       applySizes(show);
+      tryCloudinary(show);
 
       // 타이밍/이징 변수
       const rs     = getComputedStyle(document.documentElement);
