@@ -2017,6 +2017,36 @@ const CLD_FOLDER = '';
 const _folderSeg = CLD_FOLDER ? '/' + CLD_FOLDER.replace(/^\/|\/$/g, '') : '';
 const CLD_BASE   = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${CLD_OPTS}${_folderSeg}/`;
 
+function addPreloadLink(href){
+  try{
+    const head = document.head || document.getElementsByTagName('head')[0];
+    if ([...head.querySelectorAll('link[rel="preload"][as="image"]')].some(l => l.href === href)) return;
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as  = 'image';
+    link.href = href;
+    head.appendChild(link);
+  }catch(_){}
+}
+
+async function warmImage(url){
+  addPreloadLink(url);
+  try{
+    const im = new Image();
+    im.src = url;
+    if (im.decode) await im.decode();
+  }catch(_){}
+}
+
+function warmCloudinaryVariants(urls, widths=[800,1200]){
+  urls.forEach(u=>{
+    widths.forEach(w=>{
+      const cld = toCloudinaryPathWithWidth(u, w, 'auto:eco');
+      if (cld) addPreloadLink(cld);
+    });
+  });
+}
+
 function migrateImagesPath(url){
   if (!url) return url;
   // images/(products|ui|list)/...  → images/...
@@ -2492,6 +2522,26 @@ function setAspectFromImage(card, imgEl){
   else imgEl.addEventListener('load', apply, { once:true });
 }
 
+const prodWarmIO = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(!entry.isIntersecting) return;
+    const card  = entry.target;
+    const pid   = card.dataset.pid;
+    const prod  = products.find(p=>String(p.id)===String(pid));
+    if(!prod) return;
+
+    const swWrap = card.querySelector('.prod-swatches');
+    const curIdx = Math.max(0, [...(swWrap?.children||[])].findIndex(b=>b.classList.contains('active')));
+    const imgs = (prod.colorVariants?.[curIdx]?.images)||[];
+    imgs.slice(0,3).forEach(src=>{
+      const c = toCloudinaryPathWithWidth(src, 800, 'auto:eco');
+      if (c){ addPreloadLink(c); warmImage(c); }
+    });
+
+    prodWarmIO.unobserve(card);
+  });
+},{root:null, rootMargin:'300px', threshold:0.01});
+
 const STATIC_SIMPLE_IDS = new Set(['3','10','24','31']);
 
 function createStaticCard(prod){
@@ -2512,6 +2562,8 @@ function createStaticCard(prod){
   card.appendChild(img);
 
   setAspectFromImage(card, img);
+
+requestAnimationFrame(()=>prodWarmIO.observe(card));
 
   return card;
 }
@@ -2646,23 +2698,25 @@ if (nowImg) setAspectFromImage(card, nowImg);
       s.appendChild(img);
       slider.appendChild(s);
     }
-    imgs.forEach((src, i) => {
-      const s   = document.createElement('div');
-      const img = document.createElement('img');
-      s.className = 'prod-slide';
-   if(i === 0){
-     img.loading = 'eager';
-     img.src = src;
-     tryCloudinary(img);
-     applySizes(img);
-   }else{
-     img.loading = 'lazy';
-     setImgSrcLazy(img, src);
-   }
-      img.alt     = `${prod.id} - ${curVar.label} ${i+1}`;
-      s.appendChild(img);
-      slider.appendChild(s);
-    });
+imgs.forEach((src, i) => {
+  const s   = document.createElement('div');
+  const img = document.createElement('img');
+  s.className = 'prod-slide';
+
+  if (i < 2){
+    img.loading = 'eager';
+    img.src = src;
+    tryCloudinary(img);
+    applySizes(img);
+  } else {
+    img.loading = 'lazy';
+    setImgSrcLazy(img, src);
+  }
+
+  img.alt = `${prod.id} - ${curVar.label} ${i+1}`;
+  s.appendChild(img);
+  slider.appendChild(s);
+});
     {
       const s = document.createElement('div');
       s.className = 'prod-slide';
@@ -2722,6 +2776,13 @@ d.addEventListener('click', ()=>{
       btn.addEventListener('click', ()=>{
         if (i === vIndex) return;
         vIndex = i;
+{
+  const hotImgs = (prod.colorVariants[vIndex]?.images)||[];
+  hotImgs.slice(0,2).forEach(src=>{
+    const c = toCloudinaryPathWithWidth(src, 800, 'auto:eco');
+    if (c){ addPreloadLink(c); warmImage(c); }
+  });
+}
         [...swWrap.querySelectorAll('.prod-swatch')].forEach((el, idx)=>{
           el.classList.toggle('active', idx === vIndex);
         });
@@ -2772,7 +2833,7 @@ const currentSlideImg = slider.querySelectorAll('.prod-slide img')[sIndex + 1];
    observeLazy(currentSlideImg);
    currentSlideImg.addEventListener('load', ()=> setAspectFromImage(card, currentSlideImg), { once:true });
 }
-
+requestAnimationFrame(()=>prodWarmIO.observe(card));
   return card;
 }
 
@@ -5002,9 +5063,15 @@ async function commitLookImage(nowToken){
 
 function scheduleLookCommit(target = currentLook){
   queuedLook = Math.min(maxLook, Math.max(1, Number(target) || 1));
-
   lookCommitToken++;
   const myToken = lookCommitToken;
+
+  const tgt = queuedLook;
+  const neigh = [tgt, Math.max(1,tgt-1), Math.min(maxLook,tgt+1)];
+  neigh.forEach(n=>{
+    const src = `images/look${n}.jpg`;
+    warmCloudinaryVariants([src], [800,1200,1600,2000]);
+  });
 
   clearTimeout(lookCommitTimer);
   lookCommitTimer = setTimeout(() => {
@@ -5238,14 +5305,12 @@ async function swapLookImage(nextSrc){
       blackout.style.transition = 'none';
       blackout.style.opacity = '1';
 
-      // 다음 프레임 두 번 대기
       await new Promise(r => requestAnimationFrame(()=>requestAnimationFrame(r)));
 
-      // 다음 이미지 프리로드
       await preload(srcToShow);
 
-      // 실제 소스 교체
       show.src = srcToShow;
+show.fetchPriority = 'high';
 const __widths = [800, 1200, 1600, 2000];
 show.srcset = __widths.map(w => `${toCloudinaryPathWithWidth(srcToShow, w)} ${w}w`).join(', ');
 show.sizes  = '(max-width: 1200px) 80vw, 40vw';
@@ -5524,26 +5589,43 @@ function renderListSlides(meta){
 
   const imgs = meta.images;
 
-  fadeImgs = imgs.map((src, i) => {
-    const img = document.createElement('img');
-    img.className = 'fade-img';
-    if (i === 0) {
-      img.loading = 'eager';
-      img.src = src;
-      tryCloudinary(img);
-    } else {
-      setImgSrcLazy(img, src);
-    }
-    img.alt = `${meta.name || 'Look'} ${i+1}`;
-    stack.appendChild(img);
-    return img;
-  });
+fadeImgs = imgs.map((src, i) => {
+  const img = document.createElement('img');
+  img.className = 'fade-img';
+
+  if (i < 2) {
+    img.loading = 'eager';
+    img.src = src;
+    tryCloudinary(img);
+  } else {
+    img.loading = 'lazy';
+    setImgSrcLazy(img, src);
+  }
+
+  // 50vw 정도 차지 → 크기 힌트
+  const widths = [800, 1200, 1600];
+  const set = widths.map(w => `${toCloudinaryPathWithWidth(src, w, 'auto:eco')} ${w}w`).join(', ');
+  img.srcset = set;
+  img.sizes  = '(max-width: 1400px) 50vw, 700px';
+
+  img.alt = `${meta.name || 'Look'} ${i+1}`;
+  stack.appendChild(img);
+  return img;
+});
+
+listViewport.appendChild(stack);
+
+// lazy 대상만 관측
+stack.querySelectorAll('img[data-src]').forEach(observeLazy);
+
+requestAnimationFrame(() => {
+  if (fadeImgs[0]) fadeImgs[0].classList.add('is-active');
+});
+
+fadeIndex = 0;
+renderListDots(fadeImgs.length);
 
   listViewport.appendChild(stack);
-
-stack.querySelectorAll('img[data-src]').forEach((img) => {
-  commitSrcWithCloudinary(img);
-});
 
   requestAnimationFrame(() => {
     if (fadeImgs[0]) fadeImgs[0].classList.add('is-active');
@@ -5567,6 +5649,13 @@ async function fadeTo(next){
   nxt.classList.add('is-active');
 
   updateListDotsActive(next);
+
+const nextNext = (next + 1) % fadeImgs.length;
+const nn = fadeImgs[nextNext];
+if (nn && nn.dataset && nn.dataset.src){
+  commitSrcWithCloudinary(nn);
+  ensureDecoded(nn, 320);
+}
 
   setTimeout(() => { fadeBusy = false; }, 360);
   fadeIndex = next;
@@ -5700,6 +5789,9 @@ if (isLook10Outer && spec2Text && spec2Text.trim() !== '') {
   });
 
   renderListSlides({ name: entry.name, images: curVar.images });
+if (curVar && Array.isArray(curVar.images)){
+  warmCloudinaryVariants(curVar.images.slice(0,3), [800,1200,1600]);
+}
 }
 
 document.getElementById('listChips').addEventListener('click', (e) => {
