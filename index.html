@@ -2108,26 +2108,18 @@ function toCloudinaryPathWithWidth(localSrc, w = 800, quality = 'auto'){
 }
 
 function setImgSrcLazy(img, url){
-  img.dataset.src = migrateImagesPath(url);          // ← 추가
+  const cld = toCloudinaryPathWithWidth(migrateImagesPath(url), 1200, 'auto:eco') || migrateImagesPath(url);
+  img.dataset.src = cld;
   img.removeAttribute('src');
   img.loading = 'lazy';
+  img.dataset.noCld = '1';
 }
 
 function commitSrcWithCloudinary(img){
   const url = img.dataset.src;
   if(!url) return;
-
-  const cldMaybe = toCloudinaryPath(url);
-
-  if (Preload.has(url) || (cldMaybe && Preload.has(cldMaybe))) {
-    img.loading = 'eager';
-    img.setAttribute('src', url);
-    tryCloudinary(img);
-    return;
-  }
-
+  img.loading = 'eager';
   img.setAttribute('src', url);
-  tryCloudinary(img);
 }
 
 const io = new IntersectionObserver((entries)=>{
@@ -2153,33 +2145,18 @@ function toCloudinaryPath(localSrc){
 }
 
 function tryCloudinary(img){
-  if (img.dataset.noCld) return;
-
-  const cur = img.getAttribute('src') || '';
-  const migrated = migrateImagesPath(cur);
-  if (migrated && migrated !== cur) {
-    img.setAttribute('src', migrated);
-  }
-
+  if (img.dataset.noCld === '1') return; 
   const src = img.getAttribute('src') || '';
   if (!src || src.includes('res.cloudinary.com')) return;
-
   const cld = toCloudinaryPath(src);
   if (!cld) return;
 
   img.dataset.localSrc = src;
-  if (img.hasAttribute('srcset')) img.dataset.localSrcset = img.getAttribute('srcset');
-  if (img.hasAttribute('sizes'))  img.dataset.localSizes  = img.getAttribute('sizes');
-
   img.src = cld;
 
   const onErr = () => {
     img.removeEventListener('error', onErr);
     img.src = img.dataset.localSrc || src;
-
-    if (img.dataset.localSrcset) img.removeAttribute('srcset');
-    if (img.dataset.localSizes)  img.removeAttribute('sizes');
-
     img.dataset.noCld = '1';
   };
   img.addEventListener('error', onErr, { once:true });
@@ -2592,18 +2569,31 @@ const prodWarmIO = new IntersectionObserver((entries)=>{
 
     const curImgs = (prod.colorVariants?.[curIdx]?.images)||[];
     Preload.preloadAll(
-      curImgs.slice(0,3).map(src => toCloudinaryPathWithWidth(src, 1200, 'auto:eco') || src)
+      curImgs.slice(0,3).map(src => toCloudinaryPathWithWidth(src, 1600, 'auto:eco') || src)
     );
 
     prod.colorVariants?.forEach((v,i)=>{
       if (i===curIdx) return;
-      const subset = (v.images||[]).slice(0,2);
-      subset.forEach(src => Preload.warmWithWidths(src, [800,1200]));
+      (v.images||[]).slice(0,2).forEach(src =>
+        Preload.preload(toCloudinaryPathWithWidth(src, 1200, 'auto:eco') || src)
+      );
     });
 
     prodWarmIO.unobserve(card);
   });
-},{root:null, rootMargin:'400px', threshold:0.01});
+},{root:null, rootMargin:'800px', threshold:0.01});
+
+function warmAroundVariant(images, targetIndex){
+  if (!images || !images.length) return;
+  const picks = new Set([
+    images[targetIndex],
+    images[(targetIndex+1)%images.length],
+    images[(targetIndex-1+images.length)%images.length]
+  ].filter(Boolean));
+  picks.forEach(src =>
+    Preload.preload(toCloudinaryPathWithWidth(src, 1600, 'auto:eco') || src)
+  );
+}
 
 const STATIC_SIMPLE_IDS = new Set(['3','10','24','31']);
 
@@ -2687,30 +2677,45 @@ function setXIndex(newX, { animate = true } = {}) {
   }
 }
 
- function move(step){
-   const now = performance.now();
-   if (now - clickLockTs < COOLDOWN_MS) return;
-   clickLockTs = now;
+async function move(step){
+  const now = performance.now();
+  if (now - clickLockTs < COOLDOWN_MS) return;
+  clickLockTs = now;
 
-   const dir = step > 0 ? +1 : -1;
-   if (isTransiting){
-     pendingDir = dir;
-     return;
-   }
+  const dir = step > 0 ? +1 : -1;
+  if (isTransiting){
+    pendingDir = dir;
+    return;
+  }
 
-   const imgs = prod.colorVariants[vIndex].images;
-   const realCount = imgs.length;
+  const imgs = prod.colorVariants[vIndex].images;
+  const realCount = imgs.length;
 
-   let xIndex = Number(slider.dataset.xIndex || (sIndex + 1));
-   const nextX = xIndex + dir;
-   isTransiting = true;
-   left.disabled = right.disabled = true;
-   setXIndex(nextX, { animate:true });
+  const targetIndex = (sIndex + dir + realCount) % realCount;
 
-   sIndex = (sIndex + dir + realCount) % realCount;
-   renderDots();
-   updateArrowsState();
- }
+  const slides   = slider.querySelectorAll('.prod-slide img');
+  const targetEl = slides[targetIndex + 1];
+
+  if (typeof warmAroundVariant === 'function') {
+    warmAroundVariant(imgs, targetIndex);
+  }
+
+  if (targetEl && targetEl.dataset && targetEl.dataset.src){
+    commitSrcWithCloudinary(targetEl);
+  }
+  if (targetEl) {
+    await ensureDecoded(targetEl, 320);
+  }
+
+  const nextX = Number(slider.dataset.xIndex || (sIndex + 1)) + dir;
+  isTransiting = true;
+  left.disabled = right.disabled = true;
+  setXIndex(nextX, { animate:true });
+
+  sIndex = targetIndex;
+  renderDots();
+  updateArrowsState();
+}
 
 slider.addEventListener('transitionend', (e) => {
   if (e.target !== slider || e.propertyName !== 'transform') return;
@@ -2816,6 +2821,9 @@ imgs.forEach((src, i) => {
       d.className = 'dot' + (i===sIndex ? ' active' : '');
 d.addEventListener('click', ()=>{
   sIndex = i;
+
+  try { warmAroundVariant(prod.colorVariants[vIndex].images, sIndex); } catch(_){}
+
   setXIndex(i + 1, { animate:true });
   renderDots();
   updateArrowsState();
@@ -2857,6 +2865,7 @@ btn.addEventListener('click', async ()=>{
     el.classList.toggle('active', idx === vIndex);
   });
   sIndex = 0;
+try { warmAroundVariant(prod.colorVariants[vIndex].images, 0); } catch(_){}
   isTransiting = false;
   pendingDir   = 0;
   left.disabled = right.disabled = false;
@@ -5282,7 +5291,7 @@ async function preload(src){
 }
 
 function applySizes(el){
-  el.sizes = "(max-width: 780px) 80vw, 50vw";
+  el.sizes = "(max-width: 780px) 80vw, (max-width: 1200px) 33vw, 25vw";
 }
 
 function lockStackSize(lock){
@@ -5372,11 +5381,16 @@ async function swapLookImage(nextSrc){
         el.style.zIndex = '1';
       });
 
-      show.src = srcToShow;
-      const __widths = [800,1200,1600,2000];
-      show.srcset = __widths.map(w => `${toCloudinaryPathWithWidth(srcToShow, w)} ${w}w`).join(', ');
-      show.sizes  = '(max-width: 1200px) 80vw, 40vw';
-      tryCloudinary(show);
+show.fetchPriority = 'high';
+show.decoding = 'async';
+show.loading  = 'eager';
+show.src      = cld1200;
+
+const widths = [800,1200,1600,2000];
+show.srcset = widths.map(w => `${toCloudinaryPathWithWidth(srcToShow, w)} ${w}w`).join(', ');
+show.sizes  = '(max-width: 1400px) 40vw, 560px';
+
+await ensureDecoded(show, 360);
 
       show.style.visibility = 'visible';
       show.style.opacity    = '0';
@@ -5676,11 +5690,20 @@ function renderListSlides(meta){
 
   listViewport.appendChild(stack);
 
-  stack.querySelectorAll('img[data-src]').forEach(observeLazy);
+stack.querySelectorAll('img[data-src]').forEach(observeLazy);
 
-  requestAnimationFrame(() => {
-    if (fadeImgs[0]) fadeImgs[0].classList.add('is-active');
-  });
+requestAnimationFrame(async () => {
+  if (fadeImgs[0]) {
+    if (fadeImgs[0].dataset && fadeImgs[0].dataset.src) commitSrcWithCloudinary(fadeImgs[0]);
+    if (fadeImgs[1] && fadeImgs[1].dataset && fadeImgs[1].dataset.src) commitSrcWithCloudinary(fadeImgs[1]);
+    await Promise.all([ensureDecoded(fadeImgs[0], 300), ensureDecoded(fadeImgs[1], 300)]);
+    fadeImgs[0].classList.add('is-active');
+  }
+});
+
+fadeIndex = 0;
+fadeBusy  = false;
+renderListDots(fadeImgs.length);
 
   fadeIndex = 0;
   fadeBusy  = false;
