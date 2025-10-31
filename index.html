@@ -859,6 +859,7 @@ transform: translate(-3px,10px);
   transition: opacity var(--look-fade-in) var(--look-ease);
   will-change: opacity;
 }
+
 #look .look-img.is-visible{
   visibility: visible;
   opacity: 1;
@@ -2017,6 +2018,49 @@ const CLD_FOLDER = '';
 const _folderSeg = CLD_FOLDER ? '/' + CLD_FOLDER.replace(/^\/|\/$/g, '') : '';
 const CLD_BASE   = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${CLD_OPTS}${_folderSeg}/`;
 
+const Preload = (() => {
+  const _cache = new Map(); // url -> Promise<void>
+
+  async function _decode(url){
+    return new Promise((res) => {
+      const im = new Image();
+      im.decoding = 'async';
+      im.loading  = 'eager';
+      im.src = url;
+      if (im.decode) {
+        im.decode().catch(()=>{}).finally(res);
+      } else {
+        im.onload = im.onerror = () => res();
+      }
+    });
+  }
+
+  function preload(url){
+    if (!url) return Promise.resolve();
+    if (_cache.has(url)) return _cache.get(url);
+    const p = _decode(url);
+    _cache.set(url, p);
+    return p;
+  }
+
+  function preloadAll(urls){
+    return Promise.all((urls||[]).map(preload));
+  }
+
+  function has(url){ return _cache.has(url); }
+
+  function warmWithWidths(localOrCld, widths=[800,1200], quality='auto:eco'){
+    const list = widths.map(w=>{
+      const cld = toCloudinaryPathWithWidth(localOrCld, w, quality) || localOrCld;
+      return cld;
+    });
+    list.forEach(addPreloadLink);
+    return preloadAll(list);
+  }
+
+  return { preload, preloadAll, has, warmWithWidths };
+})();
+
 function addPreloadLink(href){
   try{
     const head = document.head || document.getElementsByTagName('head')[0];
@@ -2072,7 +2116,17 @@ function setImgSrcLazy(img, url){
 function commitSrcWithCloudinary(img){
   const url = img.dataset.src;
   if(!url) return;
-  img.setAttribute('src', url); 
+
+  const cldMaybe = toCloudinaryPath(url);
+
+  if (Preload.has(url) || (cldMaybe && Preload.has(cldMaybe))) {
+    img.loading = 'eager';
+    img.setAttribute('src', url);
+    tryCloudinary(img);
+    return;
+  }
+
+  img.setAttribute('src', url);
   tryCloudinary(img);
 }
 
@@ -2531,16 +2585,25 @@ const prodWarmIO = new IntersectionObserver((entries)=>{
     if(!prod) return;
 
     const swWrap = card.querySelector('.prod-swatches');
-    const curIdx = Math.max(0, [...(swWrap?.children||[])].findIndex(b=>b.classList.contains('active')));
-    const imgs = (prod.colorVariants?.[curIdx]?.images)||[];
-    imgs.slice(0,3).forEach(src=>{
-      const c = toCloudinaryPathWithWidth(src, 800, 'auto:eco');
-      if (c){ addPreloadLink(c); warmImage(c); }
+    const curIdx = Math.max(
+      0,
+      [...(swWrap?.children||[])].findIndex(b=>b.classList.contains('active'))
+    );
+
+    const curImgs = (prod.colorVariants?.[curIdx]?.images)||[];
+    Preload.preloadAll(
+      curImgs.slice(0,3).map(src => toCloudinaryPathWithWidth(src, 1200, 'auto:eco') || src)
+    );
+
+    prod.colorVariants?.forEach((v,i)=>{
+      if (i===curIdx) return;
+      const subset = (v.images||[]).slice(0,2);
+      subset.forEach(src => Preload.warmWithWidths(src, [800,1200]));
     });
 
     prodWarmIO.unobserve(card);
   });
-},{root:null, rootMargin:'300px', threshold:0.01});
+},{root:null, rootMargin:'400px', threshold:0.01});
 
 const STATIC_SIMPLE_IDS = new Set(['3','10','24','31']);
 
@@ -2709,8 +2772,16 @@ imgs.forEach((src, i) => {
     tryCloudinary(img);
     applySizes(img);
   } else {
-    img.loading = 'lazy';
-    setImgSrcLazy(img, src);
+    const cld1200 = toCloudinaryPathWithWidth(src, 1200, 'auto:eco') || src;
+    if (Preload.has(cld1200) || Preload.has(src)) {
+      img.loading = 'eager';
+      img.src = src;
+      tryCloudinary(img);
+      applySizes(img);
+    } else {
+      img.loading = 'lazy';
+      setImgSrcLazy(img, src);
+    }
   }
 
   img.alt = `${prod.id} - ${curVar.label} ${i+1}`;
@@ -2773,45 +2844,41 @@ d.addEventListener('click', ()=>{
       else if (v.chip) btn.style.background = v.chip;
       btn.title = v.label;
 
-      btn.addEventListener('click', ()=>{
-        if (i === vIndex) return;
-        vIndex = i;
-{
-  const hotImgs = (prod.colorVariants[vIndex]?.images)||[];
-  hotImgs.slice(0,2).forEach(src=>{
-    const c = toCloudinaryPathWithWidth(src, 800, 'auto:eco');
-    if (c){ addPreloadLink(c); warmImage(c); }
+btn.addEventListener('click', async ()=>{
+  if (i === vIndex) return;
+
+  const nextImages = (prod.colorVariants[i]?.images) || [];
+  await Preload.preloadAll(
+    nextImages.map(src => toCloudinaryPathWithWidth(src, 1200, 'auto:eco') || src)
+  );
+
+  vIndex = i;
+  [...swWrap.querySelectorAll('.prod-swatch')].forEach((el, idx)=>{
+    el.classList.toggle('active', idx === vIndex);
   });
-}
-        [...swWrap.querySelectorAll('.prod-swatch')].forEach((el, idx)=>{
-          el.classList.toggle('active', idx === vIndex);
-        });
-        sIndex = 0;
- isTransiting = false;
- pendingDir   = 0;
- left.disabled = right.disabled = false;
+  sIndex = 0;
+  isTransiting = false;
+  pendingDir   = 0;
+  left.disabled = right.disabled = false;
 
-slider.classList.add('fade');
+  slider.classList.add('fade');
+  const onFadeOut = (e) => {
+    if (e.target !== slider || e.propertyName !== 'opacity') return;
+    slider.removeEventListener('transitionend', onFadeOut);
 
-const onFadeOut = (e) => {
-  if (e.target !== slider || e.propertyName !== 'opacity') return;
-  slider.removeEventListener('transitionend', onFadeOut);
+    renderSlides();
+    slider.offsetHeight;
 
-  renderSlides();
-  slider.offsetHeight;
+    const nowImg = slider.querySelectorAll('.prod-slide img')[sIndex + 1];
+    if (nowImg){
+      observeLazy(nowImg);
+      nowImg.addEventListener('load', ()=> setAspectFromImage(card, nowImg), { once:true });
+    }
 
- const nowImg = slider.querySelectorAll('.prod-slide img')[sIndex + 1];
- if (nowImg){
-   observeLazy(nowImg);
-   nowImg.addEventListener('load', ()=> setAspectFromImage(card, nowImg), { once:true });
-}
-
-  slider.classList.remove('fade');
-};
-
-slider.addEventListener('transitionend', onFadeOut);
-      });
-
+    slider.classList.remove('fade');
+  };
+  slider.addEventListener('transitionend', onFadeOut);
+});
       swWrap.appendChild(btn);
     });
   }
@@ -5266,10 +5333,8 @@ let _lookSwapBusy  = false;
 let _lookSwapQueue = null;
 
 async function swapLookImage(nextSrc){
-  // 요청을 항상 최신으로 덮어써서(코얼레스) 마지막 의도만 반영
   _lookSwapQueue = nextSrc;
 
-  // 이미 실행 중이면 이번 호출은 '끝날 때까지' 기다렸다가 리턴
   if (_lookSwapBusy) {
     return new Promise((resolve) => {
       const tick = () => {
@@ -5281,70 +5346,64 @@ async function swapLookImage(nextSrc){
   }
 
   _lookSwapBusy = true;
-
   try {
     while (_lookSwapQueue) {
       const srcToShow = _lookSwapQueue;
-      _lookSwapQueue = null; // 소모
+      _lookSwapQueue = null;
 
       const blackout = document.getElementById('lookBlackout');
       const show = onA ? imgB : imgA;
       const hide = onA ? imgA : imgB;
 
-      // 외부 호환을 위해 유지
       window.isLookTransitioning = true;
 
-      // 애니메이션 초기 상태 정리
-      [imgA, imgB].forEach(el => {
-        try { el.getAnimations?.().forEach(a => a.cancel()); } catch(e){}
-        el.style.transition = 'none';
-        el.style.opacity = '0';
-        el.classList.remove('is-visible');
-        el.style.visibility = 'hidden';
-      });
       blackout.style.transition = 'none';
       blackout.style.opacity = '1';
 
-      await new Promise(r => requestAnimationFrame(()=>requestAnimationFrame(r)));
+      const cld1200 = toCloudinaryPathWithWidth(srcToShow, 1200) || srcToShow;
+      await Preload.preload(cld1200);
 
-      await preload(srcToShow);
+      [imgA, imgB].forEach(el => {
+        el.getAnimations?.().forEach(a => a.cancel());
+        el.style.transition = 'none';
+        el.style.opacity    = '0';
+        el.style.visibility = 'hidden';
+        el.classList.remove('is-visible');
+        el.style.zIndex = '1';
+      });
 
       show.src = srcToShow;
-show.fetchPriority = 'high';
-const __widths = [800, 1200, 1600, 2000];
-show.srcset = __widths.map(w => `${toCloudinaryPathWithWidth(srcToShow, w)} ${w}w`).join(', ');
-show.sizes  = '(max-width: 1200px) 80vw, 40vw';
-      applySizes(show);
+      const __widths = [800,1200,1600,2000];
+      show.srcset = __widths.map(w => `${toCloudinaryPathWithWidth(srcToShow, w)} ${w}w`).join(', ');
+      show.sizes  = '(max-width: 1200px) 80vw, 40vw';
       tryCloudinary(show);
 
-      // 타이밍/이징 변수
-      const rs     = getComputedStyle(document.documentElement);
-      const gapMs  = parseFloat(rs.getPropertyValue('--look-gap'))     || 140;
-      const fadeMs = parseFloat(rs.getPropertyValue('--look-fade-in')) || 520;
-      const ease   = rs.getPropertyValue('--look-ease')?.trim() || 'cubic-bezier(.22,.61,.36,1)';
-
-      // 가터(블랙아웃) 살짝 대기 후 페이드
-      await new Promise(r => setTimeout(r, gapMs));
-
-      blackout.style.transition = `opacity ${gapMs}ms ${ease}`;
-      show.style.transition     = `opacity ${fadeMs}ms ${ease}`;
-
       show.style.visibility = 'visible';
-      show.style.opacity    = '1';
+      show.style.opacity    = '0';
+      show.style.zIndex     = '2';
       show.classList.add('is-visible');
-      blackout.style.opacity = '0';
 
-      await new Promise(r => setTimeout(r, fadeMs + 24));
+      await new Promise(r => requestAnimationFrame(()=>requestAnimationFrame(r)));
+      const rs   = getComputedStyle(document.documentElement);
+      const gap  = parseFloat(rs.getPropertyValue('--look-gap'))     || 140;
+      const fade = parseFloat(rs.getPropertyValue('--look-fade-in')) || 520;
+      const ease = rs.getPropertyValue('--look-ease')?.trim() || 'cubic-bezier(.22,.61,.36,1)';
+
+      show.style.transition   = `opacity ${fade}ms ${ease}`;
+      show.style.opacity      = '1';
+
+      await new Promise(r => setTimeout(r, fade + 24));
 
       hide.style.visibility = 'hidden';
       hide.style.opacity    = '0';
       hide.classList.remove('is-visible');
 
-      show.style.transition = '';
-      hide.style.transition = '';
-      blackout.style.transition = '';
+      blackout.style.transition = `opacity ${gap}ms ${ease}`;
       blackout.style.opacity = '0';
+      await new Promise(r => setTimeout(r, gap + 20));
 
+      show.style.transition = '';
+      blackout.style.transition = '';
       onA = !onA;
       requestAnimationFrame(() => lockStackSize(false));
     }
@@ -5589,49 +5648,42 @@ function renderListSlides(meta){
 
   const imgs = meta.images;
 
-fadeImgs = imgs.map((src, i) => {
-  const img = document.createElement('img');
-  img.className = 'fade-img';
+  fadeImgs = imgs.map((src, i) => {
+    const img = document.createElement('img');
+    img.className = 'fade-img';
 
-  if (i < 2) {
-    img.loading = 'eager';
-    img.src = src;
-    tryCloudinary(img);
-  } else {
-    img.loading = 'lazy';
-    setImgSrcLazy(img, src);
-  }
+    const cld1200 = toCloudinaryPathWithWidth(src, 1200, 'auto:eco') || src;
 
-  // 50vw 정도 차지 → 크기 힌트
-  const widths = [800, 1200, 1600];
-  const set = widths.map(w => `${toCloudinaryPathWithWidth(src, w, 'auto:eco')} ${w}w`).join(', ');
-  img.srcset = set;
-  img.sizes  = '(max-width: 1400px) 50vw, 700px';
+    if (i < 2 || Preload.has(cld1200) || Preload.has(src)) {
+      img.loading = 'eager';
+      img.src = src;
+      tryCloudinary(img);
+    } else {
+      img.loading = 'lazy';
+      setImgSrcLazy(img, src);
+    }
 
-  img.alt = `${meta.name || 'Look'} ${i+1}`;
-  stack.appendChild(img);
-  return img;
-});
+    const widths = [800, 1200, 1600];
+    img.srcset = widths
+      .map(w => `${toCloudinaryPathWithWidth(src, w, 'auto:eco')} ${w}w`)
+      .join(', ');
+    img.sizes  = '(max-width: 1400px) 50vw, 700px';
 
-listViewport.appendChild(stack);
-
-// lazy 대상만 관측
-stack.querySelectorAll('img[data-src]').forEach(observeLazy);
-
-requestAnimationFrame(() => {
-  if (fadeImgs[0]) fadeImgs[0].classList.add('is-active');
-});
-
-fadeIndex = 0;
-renderListDots(fadeImgs.length);
+    img.alt = `${meta.name || 'Look'} ${i+1}`;
+    stack.appendChild(img);
+    return img;
+  });
 
   listViewport.appendChild(stack);
+
+  stack.querySelectorAll('img[data-src]').forEach(observeLazy);
 
   requestAnimationFrame(() => {
     if (fadeImgs[0]) fadeImgs[0].classList.add('is-active');
   });
 
   fadeIndex = 0;
+  fadeBusy  = false;
   renderListDots(fadeImgs.length);
 }
 
@@ -5717,7 +5769,7 @@ function renderItemNav(n) {
   return cats;
 }
 
-function renderListInfo(n, cat = listCurrentCat){
+async function renderListInfo(n, cat = listCurrentCat){
   const catalog = listCatalog[n] || {};
   const availableCats = renderItemNav(n); // ['outer','bottom'] 등
 
@@ -5788,13 +5840,18 @@ if (isLook10Outer && spec2Text && spec2Text.trim() !== '') {
     chips.appendChild(b);
   });
 
+const imgsToWarm = (curVar?.images) || [];
+await Preload.preloadAll(
+  imgsToWarm.map(src => toCloudinaryPathWithWidth(src, 1200, 'auto:eco') || src)
+);
+
   renderListSlides({ name: entry.name, images: curVar.images });
 if (curVar && Array.isArray(curVar.images)){
   warmCloudinaryVariants(curVar.images.slice(0,3), [800,1200,1600]);
 }
 }
 
-document.getElementById('listChips').addEventListener('click', (e) => {
+document.getElementById('listChips').addEventListener('click', async (e) => {
   const btn = e.target.closest('.chip');
   if (!btn) return;
 
@@ -5804,33 +5861,40 @@ document.getElementById('listChips').addEventListener('click', (e) => {
 
   selectedVariantByLookCat.set(vk(listCurrentLook, listCurrentCat), key);
 
-const vObj = entry.variants[key];
-document.getElementById('listColorName').textContent = vObj.label || '';
+  const vObj = entry.variants[key];
+  document.getElementById('listColorName').textContent = vObj.label || '';
 
-const specEl   = document.getElementById('listSpec');
-const spec2El  = document.getElementById('listSpec2');
-const wrapEl   = document.getElementById('listSpecWrap');
+  const specEl   = document.getElementById('listSpec');
+  const spec2El  = document.getElementById('listSpec2');
+  const wrapEl   = document.getElementById('listSpecWrap');
 
-const s1raw = (vObj.spec)  || entry.spec  || '';
-specEl.textContent = s1raw.replace(/^\s+|\s+$/g, '').replace(/\n{3,}/g, '\n\n');
+  const s1raw = (vObj.spec)  || entry.spec  || '';
+  specEl.textContent = s1raw.replace(/^\s+|\s+$/g, '').replace(/\n{3,}/g, '\n\n');
 
-const isLook10Outer = (listCurrentLook === 10 && listCurrentCat === 'outer');
-const s2raw = (vObj.spec2) || entry.spec2 || '';
-const s2    = s2raw.replace(/^\s+|\s+$/g, '').replace(/\n{3,}/g, '\n\n');
+  const isLook10Outer = (listCurrentLook === 10 && listCurrentCat === 'outer');
+  const s2raw = (vObj.spec2) || entry.spec2 || '';
+  const s2    = s2raw.replace(/^\s+|\s+$/g, '').replace(/\n{3,}/g, '\n\n');
 
-if (isLook10Outer && s2 && s2.trim() !== '') {
-  spec2El.textContent = s2;
-  spec2El.hidden = false;
-  if (wrapEl) wrapEl.style.display = '';
-} else {
-  spec2El.textContent = '';
-  spec2El.hidden = true;
-}
+  if (isLook10Outer && s2 && s2.trim() !== '') {
+    spec2El.textContent = s2;
+    spec2El.hidden = false;
+    if (wrapEl) wrapEl.style.display = '';
+  } else {
+    spec2El.textContent = '';
+    spec2El.hidden = true;
+  }
+
   document.querySelectorAll('#list .chip').forEach(c =>
     c.classList.toggle('active', c.dataset.key === key)
   );
-  renderListSlides({ name: entry.name, images: entry.variants[key].images });
+
+  const imgs = vObj.images || [];
+  await Preload.preloadAll(
+    imgs.map(src => toCloudinaryPathWithWidth(src, 1200, 'auto:eco') || src)
+  );
+  renderListSlides({ name: entry.name, images: imgs });
 });
+
 
 
 async function openList(n, cat = 'outer'){
@@ -5858,7 +5922,7 @@ async function openList(n, cat = 'outer'){
 
     listCurrentLook = Math.min(11, Math.max(1, Number(n) || 1));
     listCurrentCat  = cat;
-    renderListInfo(listCurrentLook, listCurrentCat);
+await renderListInfo(listCurrentLook, listCurrentCat);
 
     pushSection('list', { silent: true });
 
