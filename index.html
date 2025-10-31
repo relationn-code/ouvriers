@@ -1,0 +1,5933 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="viewport" content="width=1200">
+<link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+<link rel="dns-prefetch" href="https://res.cloudinary.com">
+<link rel="preload" as="image" href="images/story-banner.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="images/story-title.png">
+<link rel="preload" as="image" href="images/chevron-up.png">
+<link rel="preload" as="font" href="fonts/PretendardVariable.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="fonts/Garet.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="fonts/LeFrench.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="images/products-title.png">
+<link rel="preload" as="image" href="images/gallery-banner.png">
+  <meta charset="UTF-8">
+  <title>Les Ouvriers Lookbook</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0 }
+body{
+  background:#000;
+  color:#fff;
+  overflow:hidden;
+  font-family: Garet, "Pretendard Variable", sans-serif;
+  font-weight: var(--ko-wght);
+  font-variation-settings: "wght" var(--ko-wght);
+  font-synthesis-weight: none;
+}
+
+#story{
+  will-change: transform;
+  contain: layout paint style;
+  touch-action: pan-y;}
+
+h1,h2,.title{ font-weight: 600; }  
+.story-lead   { font-weight: 500; }
+.right-panel  { font-weight: 400; }
+
+
+b,strong{ font-weight: 600; }
+
+section[hidden] { display:none !important; pointer-events:none !important; }
+
+    /* 1. Intro */
+#intro {
+  background:#fff; 
+  color:#000;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  position:relative;
+
+  min-height:100vh;
+  overflow:hidden;
+}
+    #intro.active { display:flex; }
+    #intro .title { font-family:'Le French', serif; font-size:4rem; margin-bottom:1rem }
+
+    /* 2. Gallery */
+    #gallery {
+      background:#fff;  
+      color:#000;
+  height:auto !important;
+  min-height:100dvh;
+  overflow:visible;
+  padding: 140px 28px 0;
+}
+    #gallery .heading {
+      color:#000;
+      font-family: 'Le French', serif;
+      font-size: 3.5rem;
+      text-align: center;
+      margin-top: 2.2rem;
+  margin-bottom: 2.8rem;
+    }
+#gallery .gallery-grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  column-gap: 24px;
+  row-gap: 35px;
+  max-width:1440px;
+  margin: 2.5rem auto 0; 
+}
+    #gallery .thumb {
+      cursor: default;
+      overflow: hidden;
+    }
+    #gallery .thumb img {
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  transition: transform .25s ease;
+}
+
+#gallery .thumb.extra { cursor: default; }
+#gallery .thumb.extra img { transition: none !important; }
+#gallery .thumb.extra:hover img { transform: none !important; }
+
+#gallery .gallery-cta{
+  display:flex;
+  justify-content:center;
+  margin: 50px 0 0px;
+}
+#gallery .gallery-cta-btn{
+  appearance:none;
+  background: transparent;
+  color:#000;
+  border: 3px solid #000;
+  border-radius: 7px;
+  padding: 10px 16px;
+  font-size: .95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, transform .03s ease;
+}
+#gallery .gallery-cta-btn:hover{
+  background:#000;
+  color:#fff;
+}
+#gallery .gallery-cta-btn:active{
+  transform: translateY(1px);
+}
+
+
+    .container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .left-text-block {
+      position: absolute;
+      top: 50%;
+      left: 25%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .title {
+      font-family: 'Le French', serif;
+      font-weight: 550;
+      font-size: 60px;
+      margin-bottom: 24px;
+    }
+    .look-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+    .arrow {
+      cursor: pointer;
+      font-size: 22px;
+    }
+    .arrow.disabled {
+      opacity: 0.1;
+      pointer-events: none;
+    }
+    .credit {
+  font-size: 12px;
+  color: #aaa;
+  position: absolute;
+  visibility: hidden;
+ top: 80% !important;
+    }
+    .view-all {
+      position: absolute;
+      top: 28px;
+      left: 40px;
+      font-size: 23px;
+      cursor: pointer;
+      z-index: 10;
+      opacity: 0.3
+    }
+    .image-container {
+      position: absolute;
+      top: 50%;
+      left: 68%;
+      transform: translate(-50%, -50%);
+    }
+    .image-container img {
+      max-height: 80vh;
+      width: auto;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+    .image-container img.fade-out {
+      opacity: 0;
+    }
+    .right-panel {
+      position: absolute;
+      left: calc(68% + 280px);
+      bottom: 18vh;
+      text-align: left;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+    .right-panel span {
+      font-weight: bold;
+    }
+    .down-arrow {
+      position: absolute;
+      left: calc(68% + 323px);
+      bottom: 5vh;
+      font-size: 15px;
+      cursor: pointer;
+    }
+.detail-cta{
+  position: absolute;
+  left: calc(68% + 280px);
+  bottom: 10.5vh;
+  padding: 10px 16px;
+  border: 2px solid #fff;
+  background: transparent;
+  color: #fff;
+  border-radius: 7px;
+  font-size: .95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, transform .05s ease;
+}
+.detail-cta:hover{ background:#fff; color:#000; }
+.detail-cta:active{ transform: translateY(1px); }
+
+/* 페이드 인/아웃 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+.fade-in  { animation: fadeIn  0.3s ease-out forwards; }
+.fade-out { animation: fadeOut 0.3s ease-in  forwards; }
+.right-panel p:not(:last-child){
+  margin-bottom: 12px;
+}
+
+#intro .intro-title {
+  width: 200px;
+  margin-bottom: 3em;
+}
+#intro .intro-img {
+  width: 320px;
+transform: translateY(65px);
+}
+#intro{
+  background:#fff;
+  color:#000;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  position:relative;
+}
+.intro-nav{
+  width:100%;
+  max-width:1200px;
+  padding:18px 28px 6px;
+}
+.intro-nav ul{
+  list-style:none;
+  display:flex;
+  gap:64px;
+  justify-content:center;
+  align-items:center;
+  font-size:1.05rem;
+}
+.intro-nav a{
+  color:#000; text-decoration:none;
+}
+.intro-nav a:hover{ text-decoration:underline; }
+
+.intro-title{
+  position:absolute;
+  top:35px;
+  left:58px;
+  width:220px;
+  height:auto;
+}
+
+#intro .intro-story{
+  position: absolute;
+  bottom: var(--intro-story-bottom, 25px);
+
+  left: 50%;
+  transform: translateX(-50%);
+  right: auto;
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  clip-path: none;
+  z-index: 1;
+}
+
+
+#intro .intro-story-arrow{
+  display:block;
+  width: auto; 
+  height: 12px;
+  margin: 6px auto 0;
+  max-width: none;
+}
+
+:root{
+  --prof-size: clamp(27px, 1.9vw, 27px);
+  --prof-weight: 500;
+  --prof-gap: 18px;
+  --prof-line-height: 1.8;
+  --prof-letter: .1px;
+  --prof-offset: 75px
+}
+
+#profile, #credits{
+  background:#fff; color:#000;
+  min-height:100dvh;
+  display:block;
+  --pret-wght: var(--prof-weight, 500);
+  font-family: "Pretendard Variable", system-ui, -apple-system, "Segoe UI",
+               Roboto, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-weight: var(--pret-wght);
+  font-variation-settings: "wght" var(--pret-wght);
+  font-synthesis-weight: none;
+}
+#profile { position: relative; }
+
+#profile .profile-right-art{
+  position: absolute;
+  top: 49%;
+  right: 15vw;
+  transform: translateY(-50%);
+  width: 320px;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;       
+  filter: none;
+  opacity: 0.05
+}
+#profile .profile-left{ position: relative; z-index: 1; }
+
+#profile .profile-wrap,
+#profile .profile-wrap *{
+  font-family: inherit;
+}
+
+.profile-wrap{
+  padding-top: 155px;
+  display:flex;
+  flex-direction:column;
+  min-height:100dvh;
+}
+
+.profile-left{
+  flex: 0 0 auto;
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+  padding: 0 16px;
+}
+
+.profile-info{
+  max-width: 520px;
+  margin-left: var(--prof-offset);
+  font-size: var(--prof-size);
+  font-weight: var(--prof-weight);
+  line-height: var(--prof-line-height);
+  letter-spacing: var(--prof-letter);
+}
+
+.profile-info > *{
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  margin: 0 0 var(--prof-gap);
+}
+.profile-info > *:last-child{ margin-bottom: 0; }
+
+.profile-name,
+.profile-role,
+.profile-line,
+.profile-social { margin: 0 0 var(--prof-gap); }
+.profile-social .social-link{
+  opacity: .2;
+  transition: opacity .2s ease;
+}
+.profile-social .social-link.only-icon{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:35px; height:35px;
+  color:#000; text-decoration:none;
+transform: translate(-3px,10px);
+}
+.profile-social .social-link.only-icon:hover { opacity:.8; }
+.profile-social .ig-icon{
+  width:35px; height:35px; display:block; fill:currentColor;
+}
+
+.profile-rest{ flex: 1 1 auto; }
+.profile-footer-logo{
+  width: clamp(120px, 12vw, 200px);
+  height: auto;
+}
+
+/* 크레딧 */
+#credits .profile-wrap{ padding-top:0; }
+#credits .profile-left{
+  flex: 1 1 auto;
+  position: relative;
+  display: block;
+  padding: 0 16px;
+  min-height: 100dvh;
+  position: relative;
+}
+#credits .credits-info{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  margin: 0;
+  text-align: left;
+  font-size: 24px;
+  line-height: 0.7;
+  letter-spacing: var(--prof-letter);
+  font-weight: var(--prof-weight);
+  color: #999899;
+  max-width: 450px;
+  width: min(88vw, 620px);
+  z-index: 1;
+}
+#credits .profile-left::after{
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 17vw;
+  transform: translateY(-47%);
+  width: 400px;
+  aspect-ratio: 3/4;
+  background: url("images/credits-art.jpg") center/cover no-repeat;
+  opacity: .9;
+  z-index: 0;
+  pointer-events: none;
+  filter: none;
+}
+
+#credits .credits-info > *{ margin: 0 0 var(--prof-gap); }
+#credits .credits-info > *:last-child{ margin-bottom:0; }
+
+/* --- PRODUCTS --- */
+#products{
+  background:#fff; color:#000;
+  position:relative;
+  min-height:100vh;
+}
+
+#products .intro-title{
+  position:absolute;
+  top:35px;
+  left:58px;
+  width:220px; 
+  height:auto;
+  pointer-events:none;
+  z-index:2;
+}
+
+
+.products-wrap{
+  padding: 200px 8px 0; 
+  display:flex;
+  flex-direction:column;
+  min-height:100dvh;
+}
+
+.products-rest{
+  flex: 1 1 auto;
+  display:flex;
+  align-items:center; 
+  justify-content:center;
+}
+
+.products-spacer{
+  flex: 0 0 var(--page-bottom);
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+}
+
+.products-title{
+  display:block;
+  margin: 14px auto 18px;
+  width: 180px;
+  height:auto;
+}
+
+ .prod-cats{
+   display:flex; gap:40px; justify-content:center; align-items:center;
+   list-style:none; margin:0 0 var(--gap-cats-grid); padding:0;
+   font-size:17px; letter-spacing:.2px;
+   position: relative; 
+   z-index: 0;   
+   isolation: isolate; 
+ }
+.prod-cats::before{
+  content:"";
+  position:absolute;
+  left: var(--glide-left, 0px);
+  top:  var(--glide-top,  0px);
+  width:  var(--glide-w, 0px);
+  height: var(--glide-h, 0px);
+  background:#000;
+  border-radius:0;
+  z-index: -1; 
+  opacity: 0; 
+  top:    calc(var(--glide-top, 0px) + var(--glide-oy, 0px));
+  height: calc(var(--glide-h,   0px) + var(--glide-oh, 0px));
+
+
+  transform: translate(var(--glide-dx), var(--glide-dy));
+
+  transition:
+    left .32s cubic-bezier(.22,.61,.36,1),
+    width .32s cubic-bezier(.22,.61,.36,1),
+    top .24s ease,
+    height .24s ease,
+    transform .24s ease,       /* ← 추가 */
+    opacity .18s ease;
+}
+.prod-cats.has-glider::before{ opacity: 1; }
+
+.prod-cats button{
+  appearance:none; background:transparent; border:1px solid transparent;
+  padding:1px 15px; border-radius:0px; cursor:pointer; font:inherit; color:#000;
+  transition: border-color .15s ease, background .15s ease;
+  position: relative;
+  z-index: 0;  
+  border: 1px solid transparent; 
+
+  --cat-scale: 0;
+  --cat-origin: left;
+}
+
+.prod-cats button::before{
+  opacity: 0 !important;
+  transform: none !important;
+  transition: none !important;
+  pointer-events: none !important;
+}
+.prod-cats button:hover{
+  border-color: transparent !important; 
+}
+.prod-cats button:not(.active):hover{
+  border-color:#bbb;
+}
+.prod-cats button.active{
+  border-color: transparent;
+  background: transparent;
+  color:#fff;
+  --cat-scale: 1;
+}
+
+.prod-cats button.active:hover{
+  border-color: transparent;
+}
+
+
+.prod-cats button:focus-visible{
+  outline: 2px solid #222;
+  outline-offset: 2px;
+}
+
+.prod-cats button.active::before{
+  opacity: 0 !important;
+}
+
+.prod-cats button{ --cat-scale: 0 !important; }
+.prod-cats button.active{ --cat-scale: 0 !important; }
+
+@media (hover: hover){
+  .prod-cats button:not(.active):hover{ border-color:#bbb; }
+}
+
+.prod-grid{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 6px; 
+  row-gap: 28px; 
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+
+.prod-card{
+  background: #E2E1E0;  
+  border: 0; 
+  display: grid;
+  place-items: center;
+  padding: 0px;
+  user-select: none;
+  color: #999;
+  font-size: 12px;
+}
+
+.prod-card img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;      
+}
+
+.blank-center{
+  font-size: 2rem;
+  opacity: .7;
+  text-align:center;
+}
+.intro-nav { position: relative; z-index: 9999; pointer-events: auto; }
+.intro-nav * { pointer-events: auto; }
+
+.intro-title  { position: absolute; z-index: 1; pointer-events: none; }
+.intro-slider{
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(min(60vw, 840px)); 
+  height: 60vh;                   
+  overflow: visible;
+  z-index: 2;
+}
+.intro-slide-img{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  transition: opacity var(--intro-fade-in) cubic-bezier(.22,.61,.36,1) !important;
+  backface-visibility: hidden;
+  will-change: opacity, transform;
+}
+
+.intro-slide-img.is-hidden{
+  opacity: 0;
+}
+
+#intro[hidden]{ display:none !important; }
+/* --- STORY --- */
+#story{
+  background:#fff;
+  color:#000;
+  overflow:hidden;
+}
+.story-wrap{
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 48px 24px 0 !important;
+}
+.story-label{
+  text-align:center;
+  font-size:.95rem;
+  color:#8a8a8a;
+  margin-bottom: 8px;
+}
+.story-back{
+  display:block;
+  margin: 0 auto 18px;
+  background:transparent;
+  border:0;
+  font-size: 20px;
+  cursor:pointer;
+  line-height:1;
+}
+.story-sub{
+  text-align:center;
+  font-size: 13px;
+  color:#6d6d6d;
+  margin-bottom: 28px;
+}
+.story-body{
+  font-size: 14.5px;
+  line-height: 1.85;
+  letter-spacing: .1px;
+  word-break: keep-all;
+}
+.story-body p:last-child { margin-bottom: 0; }
+.page {
+  position:absolute;
+  top:0; left:0;
+  width:100%;
+  height:100dvh;
+  transition: transform 0.7s ease;
+}
+.story-lead{
+  text-align: center;
+  font-weight: 500;
+  line-height: 1.9;
+  color:#222;
+  margin: 14px auto 26px;
+  max-width: 720px;
+}
+.story-banner{
+  width: 100vw;
+  height: calc(100dvh - var(--story-top-block));
+  margin-top: var(--story-top-block);
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  overflow: hidden;
+}
+.story-banner img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  object-position: center;
+  display: block;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  contain: paint;
+}
+
+#intro { background:#fff; z-index:2; }
+#story { background:#fff; z-index:1; }
+
+.show-intro #intro { transform:translateY(0); }
+.show-intro #story { transform:translateY(100%); }
+
+.show-story #intro { transform:translateY(-100%); }
+.show-story #story { transform:translateY(0); }
+
+/*INTRO/PRODUCTS/GALLERY 로고 & 네비 위치 */
+:root{
+  --logo-w: 180px;
+  --logo-top: 50px;
+  --logo-left: 58px;
+  --nav-pad: 18px 28px 6px;
+  --nav-maxw: 1200px;
+  --story-top-block: 5px;
+  --intro-arrow-opacity: .85;
+  --intro-arrow-opacity-hover: 1;
+  --ko-wght: 450;
+  --glide-dx: 17.5px; 
+  --glide-dy: -8px;
+  --glide-oh: -7px;
+  --glide-oy: 7px;
+  --page-bottom: 250px;
+}
+
+/* 상단 네비 */
+#intro .intro-nav,
+#products .intro-nav,
+#gallery .intro-nav{
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--nav-maxw);
+  padding: var(--nav-pad);
+  z-index: 9999;
+}
+
+#products{
+ width: 100% !important; 
+  height: auto !important;
+  min-height: 100dvh;
+  overflow: visible;
+}
+:root{
+  --nav-maxw: 1200px;
+  --nav-pad: 18px 28px 6px;
+  --logo-w: 180px;
+  --logo-top: 50px;
+  --logo-left: 58px;
+}
+
+.site-logo{
+  position: fixed;
+  top: var(--logo-top);
+  left: var(--logo-left);
+  width: var(--logo-w);
+  height: auto;
+  z-index: 9998;
+  pointer-events: none;
+}
+/* 전역 고정 네비 */
+.site-nav{
+  position: fixed;
+  top: 10px;
+  left: calc(50% + var(--sb-comp, 0px));
+  transform: translateX(-57%);
+  width: 100%;
+  max-width: var(--nav-maxw);
+  padding: var(--nav-pad);
+  z-index: 9999;
+  background: transparent;
+  pointer-events: auto;
+}
+.site-nav ul{
+  list-style: none;
+  display: flex;
+  gap: 130px;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.05rem;
+  margin: 0;
+  padding: 0;
+}
+.site-nav a{
+  color: #000; 
+  text-decoration: none;
+}
+.site-nav a:hover{ text-decoration: underline; }
+
+#products{ padding-top: 0 !important; }
+.right-panel{
+  max-width: 360px; 
+  bottom: clamp(40px, 12vh, 18vh);
+}
+
+
+/* === LOOK 섹션 === */
+#look{
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+#look .container{ position:relative; width:100%; height:100%; }
+
+#look .left-text-block{
+  position:absolute; top:50%; left:25%;
+  transform: translate(-50%, -50%);
+  text-align:center;
+}
+
+#look .image-container{
+  position:absolute; top:50%; left:68%;
+  transform: translate(-50%, -50%);
+}
+#look .look-stack{
+  position: relative;
+  width: auto; height: auto;
+}
+
+#look .look-img{
+  position:absolute; top:50%; left:50%;
+  transform: translate(-50%, -50%);
+  width:auto; height:auto; max-height:80vh; object-fit:contain;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity var(--look-fade-in) var(--look-ease);
+  will-change: opacity;
+}
+#look .look-img.is-visible{
+  visibility: visible;
+  opacity: 1;
+}
+#look .right-panel{
+  position:absolute;
+  left: calc(68% + 280px);
+  bottom: 18vh;
+  max-width: 360px;
+  text-align: left;
+  z-index: 2;
+}
+
+
+/* PRODUCT CARD */
+:root{
+  --prod-fade-in:  .30s;
+  --prod-fade-out: .30s;
+}
+.prod-card .prod-arrow,
+.prod-card .prod-swatches,
+.prod-card .prod-dots{
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--prod-fade-out) ease-in;
+  z-index: 3;
+}
+.prod-card:hover .prod-arrow,
+.prod-card:hover .prod-swatches,
+.prod-card:hover .prod-dots{
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity var(--prod-fade-in) ease-out;
+}
+
+.prod-arrow{ cursor: pointer; }
+.prod-swatch{ cursor: pointer; }
+.prod-dots .dot{ cursor: pointer; }
+
+@media (hover: none) and (pointer: coarse){
+  .prod-card .prod-arrow,
+  .prod-card .prod-swatches,
+  .prod-card .prod-dots{
+    opacity: 1;
+    pointer-events: auto;
+    transition: none;
+  }
+}
+
+
+.prod-card{
+  position: relative;
+  overflow: hidden;
+  background: #E2E1E0;
+  display: grid;
+  place-items: center;
+}
+
+.prod-slider{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  transform: translateX(0);
+  transition: transform 450ms cubic-bezier(.22,.61,.36,1); 
+  will-change: transform, opacity;
+}
+
+.prod-slide{
+  position: relative; 
+  flex: 0 0 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  opacity: 1;
+}
+.prod-slide img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.prod-slider{
+  transition: transform 450ms cubic-bezier(.22,.61,.36,1), opacity .35s ease; 
+}
+
+.prod-slider.fade{ 
+  opacity: 0; 
+}
+
+.prod-arrow{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  font-size: 22px;
+  line-height: 1;
+  color: #111;
+  padding: 4px 6px;
+  box-shadow: none;
+  cursor: pointer;
+}
+.prod-arrow.left{  left: 8px; }
+.prod-arrow.right{ right: 8px; }
+
+.prod-dots{
+  position: absolute;
+  bottom: 8px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 6px;
+}
+.prod-dots .dot{
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(0,0,0,.25);
+}
+.prod-dots .dot.active{ background: rgba(0,0,0,.65); }
+
+.prod-swatches{
+  position: absolute;
+  top: 8px; left: 8px;
+  display:flex; gap:6px;
+}
+.prod-swatch{
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,.35);
+  cursor: pointer; overflow: hidden;
+  background-size: cover;
+  background-position: center;
+}
+.prod-swatch.active{
+  box-shadow: 0 0 0 2px #000;
+}
+
+.prod-arrow:focus-visible,
+.prod-swatch:focus-visible{ outline: 2px solid #444; }
+
+
+@media (prefers-reduced-motion: reduce){
+  .prod-slide{ transition: transform .01s linear, opacity .01s linear; }
+}
+.prod-card.static .prod-arrow,
+.prod-card.static .prod-swatches,
+.prod-card.static .prod-dots { 
+  display: none !important; 
+  opacity: 0 !important; 
+  pointer-events: none !important;
+}
+.prod-card.static { cursor: default; }
+
+.products-rest{
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.products-footer-logo{
+  width: clamp(120px, 12vw, 200px);
+  height: auto;
+}
+
+.intro-slider .circle-btn{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px !important;
+  height: 14px !important;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 3;
+  line-height: 0;
+}
+
+.intro-slider .circle-btn.left  { left:  -42px !important; } 
+.intro-slider .circle-btn.right { right: -42px !important; }
+
+.intro-slider .circle-btn:hover { transform: translateY(-50%); }
+
+.intro-slider .circle-btn .circle-img{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.intro-slide-img { z-index: 1; }
+
+.intro-stage{
+  position:absolute; inset:0;
+  overflow: visible;
+  pointer-events:none;
+  transform-origin: center;
+  transform: scale(var(--intro-stage-scale, 1));
+}
+.intro-slider .circle-btn{ z-index:3; }
+.intro-slide-img{ backface-visibility:hidden; will-change:transform; }
+
+.intro-blackout{
+  position:absolute; inset:0;
+  background:#fff;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity 140ms cubic-bezier(.22,.61,.36,1);
+  z-index:2;
+}
+
+.intro-slider .circle-btn[disabled]{
+  pointer-events: none; 
+  opacity: 1;
+}
+
+#look .text-snap-out   { animation: lookTextOut 140ms ease-out forwards; }
+#look .text-snap-in    { animation: lookTextIn  160ms ease-out forwards; }
+
+@keyframes lookTextOut {
+  from { opacity:1; transform: translateY(0); }
+  to   { opacity:0; transform: translateY(-8px); }
+}
+@keyframes lookTextIn {
+  from { opacity:0; transform: translateY(8px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+#look #look-text,
+#look #right-panel {
+  contain: layout paint style;
+  will-change: transform, opacity;
+}
+
+/* Look 슬라이드 */
+:root{
+  --intro-gap: 1200ms;
+  --intro-fade-in: 2000ms;
+  --look-gap: 140ms;
+  --look-fade-in: 520ms;
+  --look-ease: cubic-bezier(.22,.61,.36,1);
+}
+
+
+#look .look-blackout{
+  position:absolute; inset:0;
+  background:#000;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity var(--look-gap) var(--look-ease);
+  z-index: 2; 
+}
+
+#look .look-img.is-visible{ opacity:1; }
+#look .look-img { transition: opacity var(--look-fade-in) var(--look-ease) !important; }
+
+.intro-blackout{ display:none !important; } 
+
+.intro-slide-img{
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto; height: auto;
+  max-width: 100%; max-height: 100%;
+  opacity: 1;
+  transition: opacity var(--intro-fade-in) cubic-bezier(.22,.61,.36,1) !important;
+}
+.intro-slide-img.is-hidden{ opacity: 0; }
+
+/* STORY 헤더 최종 오버라이드 */
+:root{
+  --story-title-size: 40px;
+  --story-title-top:  41px;
+  --story-head-gap:   35px;
+  --story-lead-size:  18px;
+  --story-lead-line:  1.8;
+  --story-lead-maxw:  720px;
+  --story-back-top:   -25px;
+}
+
+#story .story-back{
+  font-size: 0;
+  line-height: 0;
+  background: transparent;
+  position: relative;
+  z-index: 2;
+  margin-top: var(--story-back-top);
+}
+
+#story .story-back-img{
+  display: block;
+  width: auto;
+  height: 12px;
+  margin: 0 auto;
+}
+
+/* STORY */
+#story .story-title{
+  margin: var(--story-title-top) auto var(--story-head-gap);
+  text-align: center;
+
+  font-size: 0;
+  line-height: 0;
+}
+
+#story .story-title-img{
+  display: block;
+  height: var(--story-title-size); 
+  width: auto;
+  margin: 0 auto;
+}
+#story .story-lead{
+  font-size: var(--story-lead-size);
+  line-height: var(--story-lead-line);
+  max-width: var(--story-lead-maxw);
+  margin: 0 auto 26px;
+  text-align: center;
+  color: #222;
+}
+
+#intro { transform: translateY(0); }
+#story { transform: translateY(100%); }
+
+body.show-intro #intro a.intro-story::before,
+body.show-intro #intro a.intro-story::after,
+#intro a.intro-story::before,
+#intro a.intro-story::after {
+  content: none !important;
+  display: none !important;
+
+  border: 0 !important;
+  border-width: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  clip-path: none !important;
+  transform: none !important;
+  position: static !important;
+  box-shadow: none !important;
+}
+
+/* Intro 하단 스토리 버튼 튜닝*/
+#intro .intro-story{
+  text-decoration: none;
+  color: rgba(0,0,0,0.20);
+}
+
+#intro .intro-story .intro-story-arrow{
+  opacity: 0.20;
+}
+
+ @font-face{ font-family:"Pretendard Variable"; src:url("fonts/PretendardVariable.woff2") format("woff2"); font-display:swap; }
+ @font-face{ font-family:"Garet"; src:url("fonts/Garet.woff2") format("woff2"); font-display:swap; }
+ @font-face{ font-family:"Le French"; src:url("fonts/LeFrench.woff2") format("woff2"); font-display:swap; }
+
+
+/* === PRODUCTS  === */
+:root{
+  --prod-logo-w: 250px;    
+  --gap-logo-cats: 50px;    
+  --gap-cats-grid: 90px;
+}
+
+
+.products-wrap{
+  padding-top: 160px !important;
+}
+
+.products-title{
+  display:block;
+  width: var(--prod-logo-w);
+  height:auto;
+  margin: 14px auto var(--gap-logo-cats);
+}
+
+.prod-cats{
+  margin: 0 0 var(--gap-cats-grid);
+}
+  .products-wrap{ padding-top: 120px !important; }
+
+/*GALLERY: 이미지 배너 헤더 */
+:root{
+  --gallery-banner-h: 180px;
+  --gallery-banner-top: 1.0rem;  
+  --gallery-banner-bottom: 5.5rem;
+  --gallery-grid-top: 0rem;
+  --caption-offset: 13px;
+}
+
+#gallery .gallery-banner{
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+
+  margin-top: var(--gallery-banner-top);
+  margin-bottom: var(--gallery-banner-bottom);
+
+  padding: 0; 
+}
+
+#gallery .gallery-banner img{
+  display: block;
+  height: var(--gallery-banner-h); 
+  width: auto; 
+  object-fit: contain;
+}
+
+#gallery .gallery-grid{
+  margin-top: var(--gallery-grid-top);
+}
+
+/* GALLERY  */
+#gallery{
+  display: flex;     
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: 140px 50px 0; 
+}
+
+#gallery .gallery-grid{ flex: 0 0 auto; }
+
+#gallery .gallery-rest{
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+ #gallery .gallery-spacer{
+   flex: 0 0 var(--page-bottom);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gallery .gallery-footer-logo{
+  width: clamp(120px, 12vw, 200px);
+  height: auto;
+}
+
+
+#gallery .thumb{ position: relative; overflow: hidden; }
+
+#gallery .thumb img.base-img{
+  width:100%; height:100%; object-fit:contain;
+  transition: transform .25s ease; 
+}
+
+#gallery .thumb img.hover-img{
+  position:absolute; inset:0;
+  width:100%; height:100%; object-fit:contain;
+  opacity:0; transform: scale(1);
+  transition: opacity .25s ease, transform .25s ease;
+  pointer-events:none; 
+}
+#gallery .thumb{
+  position: static;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}
+#gallery .thumb-imgwrap{
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+#gallery .thumb-imgwrap img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform .25s ease;
+  display: block;
+}
+#gallery .thumb-imgwrap img.hover-img{
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity .25s ease, transform .25s ease;
+  pointer-events: none;
+}
+ #gallery .thumb-imgwrap:hover img{ transform: scale(1.03); }
+ #gallery .thumb-imgwrap:hover img.hover-img{
+  opacity: 1;
+  transform: scale(1.03);
+}
+#gallery .thumb .caption{
+  margin-top: 8px;
+  width: fit-content;
+  margin-left: var(--caption-offset);
+  font-size: 13px;
+  line-height: 1.4;
+  letter-spacing: .2px;
+  color: #000;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: left;
+  cursor: default;
+}
+
+#gallery .thumb:focus-visible img.hover-img{
+  opacity:1; transform: scale(1.03);
+}
+
+:root{
+  --xfade-out: 180ms;
+  --xfade-in:  340ms;
+  --xfade-ease-out: ease-in;
+  --xfade-ease-in:  cubic-bezier(.22,.61,.36,1);
+}
+
+.page.fade-in  { animation: fadeIn  var(--xfade-in)  var(--xfade-ease-in)  forwards; }
+.page.fade-out { animation: fadeOut var(--xfade-out) var(--xfade-ease-out) forwards; }
+
+#gallery, #look{
+  will-change: opacity;
+  contain: paint;
+}
+
+.hide-global-ui .site-logo,
+.hide-global-ui .site-nav{
+  display: none !important;
+}
+
+/* LIST PAGE (좌50 / 우50) */
+#list{
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+  will-change: opacity;
+  contain: paint;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* 좌측 50% */
+#list .list-left{
+  position:absolute;
+  inset:0 50% 0 0;
+  background:#E0E0DF;
+  display:grid;
+  place-items:center;
+}
+#list .viewport{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  will-change: transform;
+}
+ #list .slide{
+   flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+   display: grid;
+   place-items: center;
+ }
+#list .slide{
+  display: grid;
+  place-items: center;
+}
+#list .slide img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+#list .fade-stack{
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+#list .fade-img{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 320ms cubic-bezier(.22,.61,.36,1);
+  will-change: opacity;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+  backface-visibility: hidden;
+}
+#list .fade-img.is-active{ opacity: 1; }
+
+:root{
+  --list-info-shift: 40px;
+  --list-gap-base: 2px;
+  --list-gap-name: 1px;
+  --list-gap-color: 7px;
+  --list-gap-chips: 1px;
+  --list-gap-cta: 1px;
+  --list-gap-spec: 1px;
+  --list-line: 1.0;
+  --list-letter: .1px;
+}
+
+/* 우측 50%: 다크 패널 */
+#list .list-right{
+  position: absolute;
+  inset: 0 0 0 50%;
+  background: #111;
+  color: #fff;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 28px 36px 22px;
+}
+#list .name{
+  font-size: 28px;
+  margin-top: var(--list-gap-name);
+}
+#list .topbar{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 10px;
+  margin-bottom: 13px;
+}
+#list .back-btn{
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  opacity: .5;
+  font-size: 25px;
+  line-height: 1;
+  display: inline-flex; 
+  gap: 8px; 
+  align-items: center;
+  cursor: pointer;
+  justify-self: start;
+  width: auto;
+}
+#list .item-nav-dummy{
+  opacity: .5;
+  font-size: 14px;
+}
+
+#list .info{
+  overflow: auto;
+  padding: 0 6px 0 var(--list-info-shift);
+  gap: var(--list-gap-base);
+  letter-spacing: var(--list-letter);
+}
+#list .look-no{ 
+font-family: 'Pretendard Variable', serif;
+font-size: 22px; opacity: 1; margin-bottom: 2px; }
+
+#list .color-name{
+font-size: 14px;
+margin-bottom: 10px;
+opacity: .85; 
+margin-top: var(--list-gap-color);
+}
+
+#list .chips{
+  display:flex;
+  gap:8px;
+  margin-bottom:18px;
+  margin-top: var(--list-gap-chips);
+  pointer-events: none;
+}
+#list .chips .chip{
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+#list .chip{
+  appearance:none;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,.35);
+  background: var(--chip, #ccc);
+  cursor: pointer;
+}
+#list .chip.active{
+  border-color:#fff;
+  border-width:2px;
+  box-shadow:none;
+}
+#list .chip:focus-visible{
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+#list .cta{
+  width: 80%;
+  border: 2px solid #fff;
+  background: transparent;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  margin: 10px 0 20px;
+  margin-top: var(--list-gap-cta);
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 1;
+  transition: background .2s ease, color .2s ease, border-color .2s ease, transform .03s ease;
+}
+#list .cta:hover{
+  background: #BDBDBD;
+  color: #111;
+  border-color: #BDBDBD;
+}
+#list .spec{
+  font-size: 14px;
+  line-height: 1.8;
+  letter-spacing: .1px;
+  margin-top: var(--list-gap-spec);
+  white-space: pre-line;
+}
+#list .spec-wrap{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: var(--list-gap-spec);
+}
+#list .spec-wrap .spec{
+  font-size: 14px;
+  line-height: 1.8;
+  letter-spacing: .1px;
+  white-space: pre-line;
+}
+#list .spec2[hidden]{ display:none !important; }
+#list .list-dots{
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column; 
+  gap: 6px;
+  z-index: 5; 
+  pointer-events: auto;
+}
+#list .list-dots .dot{
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.7);
+  background: rgba(0,0,0,.35);
+  opacity: .9;
+  padding: 0;
+  cursor: pointer;
+  transition: transform .12s ease, opacity .12s ease;
+}
+#list .list-dots .dot:hover{ transform: scale(1.12); }
+#list .list-dots .dot.active{
+  background: #fff;
+  opacity: 1;
+}
+#list .list-dots .dot:focus-visible{
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+#list .item-nav{
+  position: absolute;
+  top: 28px;
+  right: 36px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+  font-size: 14px;
+  justify-self: auto;
+  place-self: auto;
+}
+#list .item-nav button{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.25);
+  background: transparent;
+  color:#fff;
+  padding: 3px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  opacity:.75;
+  transition: background .18s ease, color .18s ease, border-color .18s ease, opacity .18s ease;
+}
+#list .item-nav button:hover{ opacity: 1; }
+#list .item-nav button.active{
+  border-color:#fff;
+  background:#fff;
+  color:#111;
+  opacity: 1;
+}
+#list .item-nav button:disabled{
+  opacity:.28;
+  cursor: not-allowed;
+  border-color: rgba(255,255,255,.15);
+}
+/* 하단 로고(가운데) */
+#list .bottom{
+  display:grid; place-items:center;
+}
+#list .bottom img{
+  width: clamp(120px, 12vw, 200px);
+  height: auto;
+}
+
+#list .viewport{ touch-action: pan-y; }
+
+:root{
+  --footer-bottom: 80px;
+  --footer-x: 50%;
+}
+
+#profile .profile-spacer,
+#credits .profile-spacer{
+  position: fixed;
+  left: var(--footer-x); 
+  bottom: var(--footer-bottom);
+  transform: translateX(-50%);
+
+  display: block;
+  z-index: 5;
+  pointer-events: none;
+
+  width: auto;
+  height: 0 !important;
+  flex: 0 0 0 !important;
+}
+
+img, svg {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#story.story-anim .story-title,
+#story.story-anim .story-lead{
+  opacity: 0;
+  transform: translateY(12px);
+  will-change: transform, opacity;
+}
+
+#story.story-anim.play .story-title{
+  animation: storyRiseFade 640ms cubic-bezier(.22,.61,.36,1) 800ms forwards;
+}
+
+#story.story-anim.play .story-lead{
+  animation: storyRiseFade 640ms cubic-bezier(.22,.61,.36,1) 1100ms forwards;
+}
+
+@keyframes storyRiseFade{
+  from{ opacity:0; transform: translateY(12px); }
+  to  { opacity:1; transform: translateY(0);    }
+}
+
+  </style>
+</head>
+<body class="show-intro">
+  <!-- 전역 고정 로고 -->
+  <img src="images/intro-title.png" alt="ouvriers logo" class="site-logo">
+
+  <!-- 전역 고정 네비 -->
+  <nav class="site-nav">
+    <ul>
+      <li><a href="#" data-target="intro">홈 및 갤러리</a></li>
+      <li><a href="#" data-target="gallery">모든 룩</a></li>
+      <li><a href="#" data-target="products">컬렉션</a></li>
+      <li><a href="#" data-target="profile">프로파일</a></li>
+    <li><a href="#" data-target="credits">크레딧</a></li>
+    </ul>
+  </nav>
+<!-- 1. Intro -->
+<section id="intro" class="page">
+
+  <!-- 중앙 슬라이드 -->
+<div class="intro-slider" id="introSlider">
+  <button class="circle-btn left" type="button" aria-label="이전">
+<img class="circle-img" src="images/intro-btn-left.png" data-no-cld="1">
+  </button>
+
+  <img src="images/intro1.jpg" alt="intro slide"
+       class="intro-slide-img" id="introSlideImg" draggable="false">
+
+  <button class="circle-btn right" type="button" aria-label="다음">
+<img class="circle-img" src="images/intro-btn-right.png" data-no-cld="1">
+  </button>
+</div>
+
+  <!-- 하단 '스토리' 버튼 -->
+<a href="#" class="intro-story" id="introStory">
+  스토리
+  <img src="images/chevron-down.png"
+       alt="" class="intro-story-arrow" data-no-cld="1">
+</a>
+</section>
+
+<!-- 1-1. Story -->
+<section id="story" class="page">
+<div class="story-wrap">
+
+<button class="story-back" type="button" aria-label="Back to intro">
+  <img src="images/chevron-up.png" alt="" class="story-back-img">
+</button>
+
+    <!-- 타이틀 -->
+<h2 class="story-title">
+  <img src="images/story-title.png" alt="Ouvriers" class="story-title-img" data-no-cld="1">
+</h2>
+
+    <!-- 짤막한 글 -->
+    <p class="story-lead">
+보편의 시간을 견딘 이들에게도, 아름다움은 배제되지 않는 규범이 됩니다.<br>
+테크니컬과 클래식의 질서가 겹쳐<br>차분하지만 선명한 존재감을 만듭니다.
+    </p>
+
+    <!-- 사진 배너 -->
+<figure class="story-banner">
+<img
+  src="images/story-banner.jpg" data-no-cld="1"
+  alt="Les Ouvriers 컬렉션 배너"
+  loading="eager" fetchpriority="high" decoding="async"
+  width="1600" height="900">
+  <!-- <figcaption>Les Ouvriers — 24FW</figcaption> -->
+</figure>
+
+  </div>
+</section>
+  <!-- 2. Gallery -->
+  <section id="gallery">
+
+<figure class="gallery-banner">
+  <img src="images/gallery-banner.png" alt="Les Ouvriers — 모든 룩">
+</figure>
+  <div class="gallery-grid" id="galleryGrid"></div>
+  <div class="gallery-cta">
+    <button type="button" class="gallery-cta-btn" id="gallerySeeAll">
+      모든 룩 자세히 보기
+    </button>
+  </div>
+<div class="gallery-rest" aria-hidden="true"></div>
+<div class="gallery-spacer">
+  <img src="images/brand-footer-logo.png" alt="Brand Footer Logo" class="gallery-footer-logo">
+</div>
+</section>
+
+  <!-- 4. Look -->
+  <section id="look" tabindex="-1">
+    <div class="container">
+      <div id="heroText" class="left-text-block">
+        <div class="title">Les Ouvriers</div>
+        <div class="look-nav">
+          <div class="arrow" id="prev">&lsaquo;</div>
+          <div id="look-text">Look 1/11</div>
+          <div class="arrow" id="next">&rsaquo;</div>
+        </div>
+      </div>
+      <div class="view-all" id="view-all">❮</div>
+<div class="image-container">
+  <div class="look-stack" id="lookStack">
+<img class="look-img is-visible" id="lookImgA" src="images/look1.jpg" alt="Look Image A" decoding="async" fetchpriority="high" data-no-cld="1">
+<img class="look-img" id="lookImgB" alt="Look Image B" decoding="async" data-no-cld="1">
+<div class="look-blackout" id="lookBlackout"></div>
+  </div>
+</div>
+      <div class="right-panel" id="right-panel"></div>
+      <button class="detail-cta" id="detail-cta" type="button">룩 자세히 보기</button>
+    </div>
+    <div id="credit" class="credit">Illustration by J. Han</div>
+  </section>
+
+<!-- 5. List -->
+<section id="list" hidden>
+  <div class="list-left">
+    <div class="viewport" id="listViewport">
+      <div class="rail" id="listRail">
+      </div>
+    </div>
+  <div class="list-dots" id="listDots"></div>
+  </div>
+
+  <div class="list-right">
+    <!-- 상단 바 -->
+    <div class="topbar">
+<button class="back-btn" id="listBack" type="button" aria-label="룩으로">
+  <span aria-hidden="true">❮</span>
+</button>
+<div class="item-nav" id="listItemNav"></div>
+</div>
+
+    <!-- 본문 정보 -->
+    <div class="info">
+      <div class="look-no" id="listLookNo">Look #1</div>
+      <div class="name" id="listName">제품명</div>
+      <div class="color-name" id="listColorName">컬러명</div>
+      <div class="chips" id="listChips"></div>
+      <button class="cta" type="button" disabled>출시 예정</button>
+<div class="spec-wrap" id="listSpecWrap">
+  <div class="spec" id="listSpec"></div>
+  <div class="spec spec2" id="listSpec2" hidden></div>
+</div>
+    </div>
+
+    <!-- 하단 로고 -->
+    <div class="bottom">
+      <img src="images/brand-footer-logo.png" alt="Brand Logo">
+    </div>
+  </div>
+</section>
+
+<!-- 6. Products (제품) -->
+<section id="products">
+
+  <div class="products-wrap">
+    <!-- 중앙 타이틀 타이포(이미지) -->
+<img
+  src="images/products-title.png"
+  alt="Les Ouvriers — Products"
+  class="products-title">
+
+<ul class="prod-cats" id="prodCats">
+  <li><button type="button" class="active" data-key="all">전체 보기</button></li>
+  <li><button type="button" data-key="outer">아우터</button></li>
+  <li><button type="button" data-key="leather">레더</button></li>
+  <li><button type="button" data-key="tailoring">테일러링</button></li>
+  <li><button type="button" data-key="knit">니트웨어</button></li>
+  <li><button type="button" data-key="tops">셔츠 및 탑</button></li>
+  <li><button type="button" data-key="pants">팬츠</button></li>
+  <li><button type="button" data-key="shorts-skirt">쇼츠 & 스커트</button></li>
+</ul>
+
+    <!-- 4열 × 50칸 빈칸 -->
+    <div class="prod-grid" id="prodGrid"></div>
+<div class="products-rest" aria-hidden="true"></div>
+<div class="products-spacer">
+  <img src="images/brand-footer-logo.png" alt="Brand Footer Logo" class="products-footer-logo">
+</div>
+</div>
+</section>
+
+<!-- 7. Profile -->
+<section id="profile">
+  <div class="profile-wrap">
+<img src="images/profile-r.jpg" alt="" aria-hidden="true" class="profile-right-art">
+    <div class="profile-left">
+      <div class="profile-info" role="contentinfo">
+        <h3 class="profile-name">CHOIDAWON, 26</h3>
+        <p class="profile-role">designer</p>
+        <p class="profile-line">+821099122965</p>
+        <p class="profile-line">cdw2965@gmail.com</p>
+        <p class="profile-line">Seodaemun-gu, Seoul</p>
+
+<p class="profile-social">
+  <a href="https://instagram.com/makeoutfire"
+     target="_blank" rel="noopener noreferrer"
+     class="social-link only-icon" aria-label="Instagram">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="ig-icon">
+    <rect x="3" y="3" width="18" height="18" rx="5" ry="5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    <circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/>
+    </svg>
+  </a>
+</p>
+      </div>
+    </div>
+    <div class="profile-rest" aria-hidden="true"></div>
+    <div class="profile-spacer">
+      <img src="images/brand-footer-logo.png" alt="Brand Footer Logo" class="profile-footer-logo">
+    </div>
+  </div>
+</section>
+
+<!-- 8. Credits -->
+<section id="credits" hidden>
+  <div class="profile-wrap">
+    <div class="profile-left">
+      <div class="profile-info credits-info" role="contentinfo" aria-label="Credits">
+        <br>designer (garment,web)<br>
+        <br>UI engineer  /  choidawon<br> <br><br>
+        <br>illustrator  /  J.Han<br><br><br>
+        <br>painter  /  Erwan bouroullec<br><br><br><br><br><br>
+        <br>@2025 ouvrier.<br>
+      </div>
+    </div>
+
+    <!-- 하단 로고만 유지 -->
+    <div class="profile-spacer">
+      <img src="images/brand-footer-logo.png" alt="Brand Footer Logo" class="profile-footer-logo">
+    </div>
+  </div>
+</section>
+
+<script>
+const Transition = {
+  seq: 0,
+  active: null,
+  busy: false,
+  start(dest) {
+    this.seq += 1;
+    const token = { id: this.seq, dest };
+    this.active = token;
+    this.busy = true;
+    document.body.dataset.transition = '1';
+    document.body.style.pointerEvents = 'none';
+    return token;
+  },
+  isCurrent(token) {
+    return this.active && token && this.active.id === token.id;
+  },
+  end(token) {
+    if (!this.isCurrent(token)) return;
+    this.active = null;
+    this.busy = false;
+    delete document.body.dataset.transition;
+    document.body.style.pointerEvents = '';
+  }
+};
+
+function applyGlobalUIFor(sectionId){
+  const nav  = document.querySelector('.site-nav');
+  const logo = document.querySelector('.site-logo');
+  if (nav)  nav.style.display  = '';
+  if (logo) logo.style.display = '';
+
+  const hideGlobal = (sectionId === 'list' || sectionId === 'look');
+  document.body.classList.toggle('hide-global-ui', hideGlobal);
+
+  const allowScroll = (sectionId === 'products' || sectionId === 'gallery');
+  document.documentElement.style.overflowX = 'hidden';
+  document.body.style.overflowX = 'hidden';
+  document.documentElement.style.overflowY = allowScroll ? 'auto' : 'hidden';
+  document.body.style.overflowY = allowScroll ? 'auto' : 'hidden';
+}
+
+let lookSwapToken = 0;
+window.isCustomTransition = false; 
+
+function setHeaderVisible(show){
+  const nav  = document.querySelector('.site-nav');
+  const logo = document.querySelector('.site-logo');
+  if (nav)  nav.style.display  = show ? '' : 'none';
+  if (logo) logo.style.display = show ? '' : 'none';
+}
+
+
+const CLOUD_NAME = 'daizpzcxl';
+const CLD_OPTS   = 'f_auto,q_auto,dpr_auto,c_limit,w_1400';
+const CLD_FOLDER = '';
+
+const _folderSeg = CLD_FOLDER ? '/' + CLD_FOLDER.replace(/^\/|\/$/g, '') : '';
+const CLD_BASE   = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${CLD_OPTS}${_folderSeg}/`;
+
+function migrateImagesPath(url){
+  if (!url) return url;
+  // images/(products|ui|list)/...  → images/...
+  return url.replace(/^(?:\.\/)?images\/(?:products|ui|list)\//, 'images/');
+}
+
+function toCloudinaryPathWithWidth(localSrc, w = 800){
+  localSrc = migrateImagesPath(localSrc);
+  const trimmed = localSrc.replace(/^\.?\//,'');
+  if (!trimmed.startsWith('images/')) return null;
+  const opts = `f_auto,q_auto,dpr_auto,c_limit,w_${w}`;
+  const _folderSeg = CLD_FOLDER ? '/' + CLD_FOLDER.replace(/^\/|\/$/g, '') : '';
+  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${opts}${_folderSeg}/`
+         + trimmed.replace(/^images\//,'');
+}
+
+function setImgSrcLazy(img, url){
+  img.dataset.src = migrateImagesPath(url);          // ← 추가
+  img.removeAttribute('src');
+  img.loading = 'lazy';
+}
+
+function commitSrcWithCloudinary(img){
+  const url = img.dataset.src;
+  if(!url) return;
+  img.setAttribute('src', url); 
+  tryCloudinary(img);
+}
+
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      commitSrcWithCloudinary(e.target);
+      io.unobserve(e.target);
+    }
+  });
+}, { root: null, rootMargin: '200px', threshold: 0.01 });
+
+function observeLazy(img){
+  io.observe(img);
+}
+
+const COMMIT_DELAY = 130; 
+
+function toCloudinaryPath(localSrc){
+  localSrc = migrateImagesPath(localSrc);
+  const trimmed = localSrc.replace(/^\.?\//,'');
+  if (!trimmed.startsWith('images/')) return null;
+  return CLD_BASE + trimmed.replace(/^images\//,'');
+}
+
+function tryCloudinary(img){
+  if (img.dataset.noCld) return;
+
+  const cur = img.getAttribute('src') || '';
+  const migrated = migrateImagesPath(cur);
+  if (migrated && migrated !== cur) {
+    img.setAttribute('src', migrated);
+  }
+
+  const src = img.getAttribute('src') || '';
+  if (!src || src.includes('res.cloudinary.com')) return;
+
+  const cld = toCloudinaryPath(src);
+  if (!cld) return;
+
+  img.dataset.localSrc = src;
+  if (img.hasAttribute('srcset')) img.dataset.localSrcset = img.getAttribute('srcset');
+  if (img.hasAttribute('sizes'))  img.dataset.localSizes  = img.getAttribute('sizes');
+
+  img.src = cld;
+
+  const onErr = () => {
+    img.removeEventListener('error', onErr);
+    img.src = img.dataset.localSrc || src;
+
+    if (img.dataset.localSrcset) img.removeAttribute('srcset');
+    if (img.dataset.localSizes)  img.removeAttribute('sizes');
+
+    img.dataset.noCld = '1';
+  };
+  img.addEventListener('error', onErr, { once:true });
+}
+
+function autoSwapAll(){
+  document.querySelectorAll('img').forEach(tryCloudinary);
+}
+
+const mo = new MutationObserver((muts)=>{
+  muts.forEach(m=>{
+    m.addedNodes.forEach(node=>{
+      if (node.nodeType === 1){
+        if (node.tagName === 'IMG'){
+          const hostSec = node.closest('section');
+          if (hostSec && hostSec.hidden) return;
+          if (!node.getAttribute('src') && node.dataset.src) return;
+          tryCloudinary(node);
+        } else if (node.querySelectorAll){
+          node.querySelectorAll('img').forEach((img)=>{
+            const hostSec = img.closest('section');
+            if (hostSec && hostSec.hidden) return;
+            if (!img.getAttribute('src') && img.dataset.src) return;
+            tryCloudinary(img);
+          });
+        }
+      }
+    });
+  });
+});
+
+const SECTION_IDS = ['intro','gallery','products','profile','credits','look','list'];
+
+function pushSection(id, { replace = false, silent = false } = {}){
+  if (!SECTION_IDS.includes(id)) return;
+  if (!window.isCustomTransition) {
+    forceTop();
+  }
+  const state = { id };
+  if (replace) history.replaceState(state, '', location.href);
+  else         history.pushState(state,   '', location.href);
+  if (!silent) show(id);
+}
+
+function initHistory(){
+  const current = document.querySelector('section:not([hidden])')?.id || 'intro';
+  history.replaceState({ id: current }, '', location.href);
+
+
+  window.addEventListener('popstate', (e) => {
+    if (window.isCustomTransition) return;
+    const id = e.state?.id || 'intro';
+    forceTop();
+    show(id);
+  });
+}
+
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
+function forceTop() {
+  try {
+    const se = document.scrollingElement || document.documentElement;
+
+    se.scrollTop = 0;
+    window.scrollTo(0, 0);
+
+    document.getElementById('listViewport')?.scrollTo(0, 0);
+    document.querySelector('#list .info')?.scrollTo(0, 0);
+  } catch (_) {}
+
+  requestAnimationFrame(() => {
+    try {
+      const se = document.scrollingElement || document.documentElement;
+      se.scrollTop = 0;
+    } catch (_) {}
+  });
+}
+
+document.addEventListener('DOMContentLoaded', ()=> {
+  autoSwapAll();
+  mo.observe(document.body, { childList:true, subtree:true });
+  initHistory();  
+});
+
+/* === /Cloudinary === */
+function refreshLookIfVisible(){
+  const sec = document.getElementById('look');
+  if (!sec || sec.hidden) return;
+  const a = document.getElementById('lookImgA');
+  const b = document.getElementById('lookImgB');
+  if (!a || !b) return;
+
+  const aVis = a.classList.contains('is-visible');
+  a.style.visibility = aVis ? 'visible' : 'hidden';
+  b.style.visibility = aVis ? 'hidden'  : 'visible';
+  a.style.opacity    = aVis ? '1' : '0';
+  b.style.opacity    = aVis ? '0' : '1';
+
+  // eslint-disable-next-line no-unused-expressions
+  sec.offsetHeight;
+}
+
+async function preloadAndDecode(src){
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = src;
+    if (img.decode) {
+      img.decode().then(()=>resolve(true)).catch(()=>resolve(false));
+    } else {
+      img.onload = ()=>resolve(true);
+      img.onerror = ()=>resolve(false);
+    }
+  });
+}
+
+async function ensureDecoded(img, timeout = 350){
+  if (!img) return;
+  if (img.complete && img.naturalWidth) return;
+  let done = false;
+  try {
+    if (img.decode) {
+      await Promise.race([img.decode(), new Promise(r=>setTimeout(r, timeout))]);
+      done = true;
+    }
+  } catch(_) {}
+  if (!done && !(img.complete && img.naturalWidth)){
+    await new Promise(r=>{
+      const clean = ()=>{ img.removeEventListener('load', clean); img.removeEventListener('error', clean); r(); };
+      img.addEventListener('load', clean, {once:true});
+      img.addEventListener('error', clean, {once:true});
+      setTimeout(clean, timeout);
+    });
+  }
+}
+
+document.querySelectorAll('section').forEach((sec) => {
+  sec.hidden = !(sec.id === 'intro' || sec.id === 'story');
+});
+
+document.body.classList.add('show-intro');
+document.body.classList.remove('show-story');
+
+//제품 카드 데이터 (1~32번//
+const products = [
+  { id: '1',  colorVariants: [
+    { key: 'khaki', label: 'khaki', chip:'#636859', images:[
+      'images/1khaki-1.jpg',
+          'images/1khaki-2.jpg',
+          'images/1khaki-3.jpg'
+    ]},
+    { key: 'white',
+        label: 'white',
+        chip: '#E2E5EC', images:[
+'images/1white-1.jpg',
+          'images/1white-2.jpg'
+    ]}
+  ]},
+  { id: '2',  colorVariants: [
+    { key: 'blue', label: 'blue', chip:'#21262E', images:[
+      'images/2blue-1.jpg','images/2blue-2.jpg'
+    ]},
+    { key: 'black', label: 'black', chip:'#171717', images:[
+      'images/2black-1.jpg','images/2black-2.jpg','images/2black-3.jpg'
+    ]}
+  ]},
+  { id: '3',  colorVariants: [
+    { key: 'graphic', label: 'graphic', images:[
+      'images/graphic1.jpg'
+    ]}
+  ]},
+  { id: '4',  colorVariants: [
+    { key: 'maroon', label: 'maroon', chip:'#3E1424', images:[
+      'images/4maroon-1.jpg','images/4maroon-2.jpg','images/4maroon-3.jpg'
+    ]},
+    { key: 'gray', label: 'gray', chip:'#5E5D60', images:[
+      'images/4gray-1.jpg','images/4gray-2.jpg'
+    ]}
+  ]},
+  { id: '5',  colorVariants: [
+    { key: 'denim', label: 'denim', chip:'#536670', images:[
+      'images/5denim-1.jpg','images/5denim-2.jpg'
+    ]},
+    { key: 'gray', label: 'gray', chip:'#36373D', images:[
+      'images/5gray-1.jpg','images/5gray-2.jpg','images/5gray-3.jpg'
+    ]}
+  ]},
+  { id: '6',  colorVariants: [
+    { key: 'black', label: 'black', chip:'#181818', images:[
+      'images/6black-1.jpg','images/6black-2.jpg','images/6black-3.jpg'
+    ]}
+  ]},
+  { id: '7',  colorVariants: [
+    { key: 'beige', label: 'beige', chip:'#888078', images:[
+      'images/7beige-1.jpg','images/7beige-2.jpg','images/7beige-3.jpg'
+    ]},
+    { key: 'navy', label: 'navy', chip:'#1E2332', images:[
+      'images/7navy-1.jpg','images/7navy-2.jpg'
+    ]}
+  ]},
+  { id: '8',  colorVariants: [
+    { key: 'blue', label: 'blue', chip:'#4D505E', images:[
+      'images/8blue-1.jpg','images/8blue-2.jpg','images/8blue-3.jpg'
+    ]},
+    { key: 'brown', label: 'brown', chip:'#322B26', images:[
+      'images/8brown-1.jpg','images/8brown-2.jpg'
+    ]}
+  ]},
+  { id: '9',  colorVariants: [
+    { key: 'beige', label: 'beige', chip:'#908978', images:[
+      'images/9beige-1.jpg','images/9beige-2.jpg'
+    ]},
+    { key: 'black', label: 'black', chip:'#262728', images:[
+      'images/9black-1.jpg','images/9black-2.jpg','images/9black-3.jpg'
+    ]}
+  ]},
+  { id: '10', colorVariants: [
+    { key: 'graphic', label: 'graphic', images:[
+      'images/graphic2.jpg'
+    ]}
+  ]},
+  { id: '11', colorVariants: [
+    { key: 'black', label: 'black', chip:'#181717', images:[
+      'images/11black-1.jpg','images/11black-2.jpg','images/11black-3.jpg'
+    ]},
+    { key: 'beige', label: 'beige', chip:'#938D84', images:[
+      'images/11beige-1.jpg','images/11beige-2.jpg'
+    ]}
+  ]},
+  { id: '12', colorVariants: [
+    { key: 'white', label: 'white', chip:'#E6E5E3', images:[
+      'images/12white-1.jpg','images/12white-2.jpg','images/12white-3.jpg'
+    ]},
+    { key: 'brown', label: 'brown', chip:'#302928', images:[
+      'images/12brown-1.jpg','images/12brown-2.jpg'
+    ]}
+  ]},
+  { id: '13', colorVariants: [
+    { key: 'navy', label: 'navy', chip:'#2A2A39', images:[
+      'images/13navy-1.jpg','images/13navy-2.jpg','images/13navy-3.jpg'
+    ]},
+    { key: 'brown', label: 'brown', chip:'#251D18', images:[
+      'images/13brown-1.jpg','images/13brown-2.jpg'
+    ]}
+  ]},
+  { id: '14', colorVariants: [
+    { key: 'brown', label: 'brown', chip:'#251E1A', images:[
+      'images/14brown-1.jpg','images/14brown-2.jpg','images/14brown-3.jpg'
+    ]},
+    { key: 'white', label: 'white', chip:'#FFFFFF', images:[
+      'images/14white-1.jpg','images/14white-2.jpg'
+    ]}
+  ]},
+  { id: '15', colorVariants: [
+    { key: 'white', label: 'white', chip:'#EFEEED', images:[
+      'images/15white-1.jpg','images/15white-2.jpg','images/15white-3.jpg'
+    ]}
+  ]},
+  { id: '16', colorVariants: [
+    { key: 'gray', label: 'gray', chip:'#3C3E3F', images:[
+      'images/16gray-1.jpg','images/16gray-2.jpg','images/16gray-3.jpg'
+    ]},
+    { key: 'navy', label: 'navy', chip:'#181E2D', images:[
+      'images/16navy-1.jpg','images/16navy-2.jpg'
+    ]}
+  ]},
+  { id: '17', colorVariants: [
+    { key: 'black', label: 'black', chip:'#1C1D1D', images:[
+      'images/17black-1.jpg','images/17black-2.jpg','images/17black-3.jpg'
+    ]}
+  ]},
+  { id: '18', colorVariants: [
+    { key: 'gray', label: 'gray', chip:'#837E7F', images:[
+      'images/18gray-1.jpg','images/18gray-2.jpg','images/18gray-3.jpg'
+    ]},
+    { key: 'white', label: 'white', chip:'#F1F1F1', images:[
+      'images/18white-1.jpg','images/18white-2.jpg','images/18white-3.jpg'
+    ]},
+    { key: 'navy', label: 'navy', chip:'#161C25', images:[
+      'images/18navy-1.jpg','images/18navy-2.jpg'
+    ]}
+  ]},
+  { id: '19', colorVariants: [
+    { key: 'gray', label: 'gray', chip:'#60605F', images:[
+      'images/19gray-1.jpg','images/19gray-2.jpg'
+    ]},
+    { key: 'blue', label: 'blue', chip:'#444756', images:[
+      'images/19blue-1.jpg','images/19blue-2.jpg','images/19blue-3.jpg'
+    ]}
+  ]},
+  { id: '20', colorVariants: [
+    { key: 'navy', label: 'navy', chip:'#1E2332', images:[
+      'images/20navy-1.jpg','images/20navy-2.jpg','images/20navy-3.jpg'
+    ]},
+    { key: 'beige', label: 'beige', chip:'#888078', images:[
+      'images/20beige-1.jpg','images/20beige-2.jpg'
+    ]}
+  ]},
+  { id: '21', colorVariants: [
+    { key: 'check', label: 'check', chip:'#AAAEBE', images:[
+      'images/21check-1.jpg','images/21check-2.jpg','images/21check-3.jpg'
+    ]},
+    { key: 'yellow', label: 'yellow', chip:'#D9D2BC', images:[
+      'images/21yellow-1.jpg','images/21yellow-2.jpg'
+    ]}
+  ]},
+  { id: '22', colorVariants: [
+    { key: 'blue', label: 'blue', chip:'#151932', images:[
+      'images/22blue-1.jpg','images/22blue-2.jpg','images/22blue-3.jpg'
+    ]},
+    { key: 'black', label: 'black', chip:'#181818', images:[
+      'images/22black-1.jpg','images/22black-2.jpg'
+    ]}
+  ]},
+  { id: '23', colorVariants: [
+    { key: 'gray', label: 'gray', chip:'#60605F', images:[
+      'images/23gray-1.jpg','images/23gray-2.jpg','images/23gray-3.jpg'
+    ]},
+    { key: 'blue', label: 'blue', chip:'#444756', images:[
+      'images/23blue-1.jpg','images/23blue-2.jpg'
+    ]}
+  ]},
+  { id: '24', colorVariants: [
+    { key: 'graphic', label: 'graphic', images:[
+      'images/graphic3.jpg'
+    ]}
+  ]},
+  { id: '25', colorVariants: [
+    { key: 'blue', label: 'blue', chip:'#353A42', images:[
+      'images/25blue-1.jpg','images/25blue-2.jpg','images/25blue-3.jpg'
+    ]},
+    { key: 'black', label: 'black', chip:'#1C1D1D', images:[
+      'images/25black-1.jpg','images/25black-2.jpg'
+    ]}
+  ]},
+  { id: '26', colorVariants: [
+    { key: 'white', label: 'white', chip:'#EEEFF3', images:[
+      'images/26white-1.jpg','images/26white-2.jpg','images/26white-3.jpg'
+    ]}
+  ]},
+  { id: '27', colorVariants: [
+    { key: 'gray', label: 'gray', chip:'#2F302F', images:[
+      'images/27gray-1.jpg','images/27gray-2.jpg','images/27gray-3.jpg'
+    ]},
+    { key: 'brown', label: 'brown', chip:'#382D26', images:[
+      'images/27brown-1.jpg','images/27brown-2.jpg'
+    ]}
+  ]},
+  { id: '28', colorVariants: [
+    { key: 'blue', label: 'blue', chip:'#444756', images:[
+      'images/28blue-1.jpg','images/28blue-2.jpg'
+    ]},
+    { key: 'gray', label: 'gray', chip:'#60605F', images:[
+      'images/28gray-1.jpg','images/28gray-2.jpg','images/28gray-3.jpg'
+    ]}
+  ]},
+  { id: '29', colorVariants: [
+    { key: 'brown', label: 'brown', chip:'#494743', images:[
+      'images/29brown-1.jpg','images/29brown-2.jpg','images/29brown-3.jpg'
+    ]}
+  ]},
+  { id: '30', colorVariants: [
+    { key: 'blue', label: 'blue', chip:'#444756', images:[
+      'images/30blue-1.jpg','images/30blue-2.jpg','images/30blue-3.jpg'
+    ]},
+    { key: 'gray', label: 'gray', chip:'#60605F', images:[
+      'images/30gray-1.jpg','images/30gray-2.jpg'
+    ]}
+  ]},
+  { id: '31', colorVariants: [
+    { key: 'graphic', label: 'graphic', images:[
+      'images/graphic4.jpg'
+    ]}
+  ]},
+  { id: '32', colorVariants: [
+    { key: 'white', label: 'white', chip:'#F1F1F1', images:[
+      'images/32white-1.jpg','images/32white-2.jpg','images/32white-3.jpg'
+    ]},
+    { key: 'gray', label: 'gray', chip:'#A5A5A5', images:[
+      'images/32gray-1.jpg','images/32gray-2.jpg'
+    ]}
+  ]}
+];
+
+
+function setAspectFromImage(card, imgEl){
+  const apply = () => {
+    const w = imgEl.naturalWidth  || 1;
+    const h = imgEl.naturalHeight || 1;
+    card.style.aspectRatio = `${w} / ${h}`;
+  };
+  if (imgEl.complete && imgEl.naturalWidth) apply();
+  else imgEl.addEventListener('load', apply, { once:true });
+}
+
+const STATIC_SIMPLE_IDS = new Set(['3','10','24','31']);
+
+function createStaticCard(prod){
+  const card = document.createElement('div');
+  card.className = 'prod-card static';
+  card.dataset.pid = prod.id;
+
+  const firstVariant = prod.colorVariants?.[0];
+  const firstImg = firstVariant?.images?.[0] || 'images/placeholder.jpg';
+ const img = document.createElement('img');
+ img.loading = 'eager';
+ img.src = firstImg;
+ tryCloudinary(img); 
+ applySizes(img);
+
+  img.alt = `${prod.id} - ${firstVariant?.label || 'static'}`;
+
+  card.appendChild(img);
+
+  setAspectFromImage(card, img);
+
+  return card;
+}
+function createProductCard(prod, idx){
+if (STATIC_SIMPLE_IDS.has(String(prod.id))) return createStaticCard(prod);
+
+  const card = document.createElement('div');
+  card.className = 'prod-card';
+  card.dataset.pid = prod.id;
+
+ let vIndex = 0; 
+ let sIndex = 0;
+ let isTransiting = false;
+ let pendingDir   = 0;
+ let clickLockTs  = 0;
+ const TRANS_MS   = 450; 
+ const COOLDOWN_MS= 60;
+
+  const slider = document.createElement('div');
+  slider.className = 'prod-slider';
+
+  const left  = document.createElement('button');
+  const right = document.createElement('button');
+  left.className  = 'prod-arrow left';
+  right.className = 'prod-arrow right';
+  left.type  = 'button';
+  right.type = 'button';
+  left.setAttribute('aria-label','이전 이미지');
+  right.setAttribute('aria-label','다음 이미지');
+  left.innerHTML = `
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+  right.innerHTML = `
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+
+  const dots   = document.createElement('div');
+  const swWrap = document.createElement('div');
+  dots.className   = 'prod-dots';
+  swWrap.className = 'prod-swatches';
+
+function setXIndex(newX, { animate = true } = {}) {
+  if (!animate){
+    const prev = slider.style.transition;
+    slider.style.transition = 'none';
+    slider.style.transform  = `translate3d(${-newX * 100}%, 0, 0)`;
+    slider.dataset.xIndex   = String(newX);
+    slider.offsetHeight;
+    slider.style.transition = prev || '';
+  } else {
+    slider.style.transform  = `translate3d(${-newX * 100}%, 0, 0)`;
+    slider.dataset.xIndex   = String(newX);
+    isTransiting = true;
+  }
+}
+
+ function move(step){
+   const now = performance.now();
+   if (now - clickLockTs < COOLDOWN_MS) return;
+   clickLockTs = now;
+
+   const dir = step > 0 ? +1 : -1;
+   if (isTransiting){
+     pendingDir = dir;
+     return;
+   }
+
+   const imgs = prod.colorVariants[vIndex].images;
+   const realCount = imgs.length;
+
+   let xIndex = Number(slider.dataset.xIndex || (sIndex + 1));
+   const nextX = xIndex + dir;
+   isTransiting = true;
+   left.disabled = right.disabled = true;
+   setXIndex(nextX, { animate:true });
+
+   sIndex = (sIndex + dir + realCount) % realCount;
+   renderDots();
+   updateArrowsState();
+ }
+
+slider.addEventListener('transitionend', (e) => {
+  if (e.target !== slider || e.propertyName !== 'transform') return;
+
+  const imgs = prod.colorVariants[vIndex].images;
+  const realCount = imgs.length;
+  let xIndex = Number(slider.dataset.xIndex || (sIndex + 1));
+
+  const snapTo = (toX) => {
+    const prev = slider.style.transition;
+    slider.style.transition = 'none';
+    slider.style.transform  = `translate3d(${-toX * 100}%, 0, 0)`;
+    slider.dataset.xIndex   = String(toX);
+    slider.offsetHeight;
+    slider.style.transition = prev || '';
+  };
+
+  if (xIndex === 0){
+    snapTo(realCount);
+  } else if (xIndex === realCount + 1){
+    snapTo(1);
+  }
+
+  isTransiting = false;
+  left.disabled = right.disabled = false;
+
+  if (pendingDir !== 0){
+    const dir = pendingDir;
+    pendingDir = 0;
+    setTimeout(() => move(dir), 0);
+  }
+const nowImg = slider.querySelectorAll('.prod-slide img')[sIndex + 1];
+if (nowImg) setAspectFromImage(card, nowImg);
+});
+
+  function renderSlides(){
+    slider.innerHTML = '';
+    const curVar = prod.colorVariants[vIndex];
+    const imgs = curVar.images;
+    const n = imgs.length;
+
+    {
+      const s = document.createElement('div');
+      s.className = 'prod-slide';
+      const img = document.createElement('img');
+      setImgSrcLazy(img, imgs[n - 1]);
+      img.alt = `${prod.id} - ${curVar.label} CLONE-LAST`;
+      s.appendChild(img);
+      slider.appendChild(s);
+    }
+    imgs.forEach((src, i) => {
+      const s   = document.createElement('div');
+      const img = document.createElement('img');
+      s.className = 'prod-slide';
+   if(i === 0){
+     img.loading = 'eager';
+     img.src = src;
+     tryCloudinary(img);
+     applySizes(img);
+   }else{
+     img.loading = 'lazy';
+     setImgSrcLazy(img, src);
+   }
+      img.alt     = `${prod.id} - ${curVar.label} ${i+1}`;
+      s.appendChild(img);
+      slider.appendChild(s);
+    });
+    {
+      const s = document.createElement('div');
+      s.className = 'prod-slide';
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      setImgSrcLazy(img, imgs[0]);
+      img.alt = `${prod.id} - ${curVar.label} CLONE-FIRST`;
+      s.appendChild(img);
+      slider.appendChild(s);
+    }
+   slider.querySelectorAll('img[data-src]').forEach(observeLazy);
+
+    setXIndex(sIndex + 1, { animate:false });
+    renderDots();
+    updateArrowsState();
+  isTransiting = false;
+  pendingDir   = 0;
+  left.disabled = right.disabled = false;
+  }
+
+  function renderDots(){
+    dots.innerHTML = '';
+    const max = prod.colorVariants[vIndex].images.length;
+    for (let i=0; i<max; i++){
+      const d = document.createElement('div');
+      d.className = 'dot' + (i===sIndex ? ' active' : '');
+d.addEventListener('click', ()=>{
+  sIndex = i;
+  setXIndex(i + 1, { animate:true });
+  renderDots();
+  updateArrowsState();
+
+  const nowImg = slider.querySelectorAll('.prod-slide img')[sIndex + 1];
+  if (nowImg){
+    observeLazy(nowImg);
+    nowImg.addEventListener('load', () => setAspectFromImage(card, nowImg), { once:true });
+  }
+});
+      dots.appendChild(d);
+    }
+  }
+
+  function updateArrowsState(){
+  }
+
+  function renderSwatches(){
+    swWrap.innerHTML = '';
+    prod.colorVariants.forEach((v, i)=>{
+      const btn = document.createElement('button');
+      btn.className = 'prod-swatch' + (i===vIndex ? ' active' : '');
+      btn.type = 'button';
+
+      if (v.chipThumb) btn.style.backgroundImage = `url('${v.chipThumb}')`;
+      else if (v.chip) btn.style.background = v.chip;
+      btn.title = v.label;
+
+      btn.addEventListener('click', ()=>{
+        if (i === vIndex) return;
+        vIndex = i;
+        [...swWrap.querySelectorAll('.prod-swatch')].forEach((el, idx)=>{
+          el.classList.toggle('active', idx === vIndex);
+        });
+        sIndex = 0;
+ isTransiting = false;
+ pendingDir   = 0;
+ left.disabled = right.disabled = false;
+
+slider.classList.add('fade');
+
+const onFadeOut = (e) => {
+  if (e.target !== slider || e.propertyName !== 'opacity') return;
+  slider.removeEventListener('transitionend', onFadeOut);
+
+  renderSlides();
+  slider.offsetHeight;
+
+ const nowImg = slider.querySelectorAll('.prod-slide img')[sIndex + 1];
+ if (nowImg){
+   observeLazy(nowImg);
+   nowImg.addEventListener('load', ()=> setAspectFromImage(card, nowImg), { once:true });
+}
+
+  slider.classList.remove('fade');
+};
+
+slider.addEventListener('transitionend', onFadeOut);
+      });
+
+      swWrap.appendChild(btn);
+    });
+  }
+
+  card.appendChild(slider);
+  card.appendChild(left);
+  card.appendChild(right);
+  card.appendChild(dots);
+  card.appendChild(swWrap);
+
+  left.addEventListener('click', ()=> move(-1));
+  right.addEventListener('click', ()=> move(1));
+
+  renderSlides();
+  renderSwatches();
+
+const currentSlideImg = slider.querySelectorAll('.prod-slide img')[sIndex + 1];
+ if (currentSlideImg){
+   observeLazy(currentSlideImg);
+   currentSlideImg.addEventListener('load', ()=> setAspectFromImage(card, currentSlideImg), { once:true });
+}
+
+  return card;
+}
+
+const grid = document.getElementById('prodGrid');
+grid.innerHTML = '';
+
+const TOTAL_CARDS = 32;
+
+function makePlaceholder(id){
+  return {
+    id: `ph-${id}`,
+    colorVariants: [{
+      key: 'placeholder',
+      label: 'Coming soon',
+      chip: '#d8d8d8',
+      images: [ 'images/placeholder.jpg' ] 
+    }]
+  };
+}
+
+for (let i = 0; i < TOTAL_CARDS; i++){
+  const prod = products[i] || makePlaceholder(i+1);
+  grid.appendChild(createProductCard(prod, i));
+}
+
+const CATEGORY_MAP = {
+  "all": [], 
+  "outer":        [7,8,9,12,13,14,20],
+  "leather":      [5,7,12,14,17],
+  "tailoring":    [2,15,16,23,28,30],
+  "knit":         [4,6,27],
+  "tops":         [1,18,21,26,32],
+  "pants":        [5,11,17,22,29],
+  "shorts-skirt": [19,25],
+};
+
+const prodGrid   = document.getElementById('prodGrid');
+const allCards   = Array.from(prodGrid.children);
+const cardById   = new Map(allCards.map(el => [el.dataset.pid, el]));
+const catsWrap   = document.getElementById('prodCats');
+
+function moveCategoryGlider(toBtn){
+  if(!toBtn) return;
+  const wrap = document.getElementById('prodCats');
+  const wRect = wrap.getBoundingClientRect();
+  const bRect = toBtn.getBoundingClientRect();
+
+  const left = Math.round(bRect.left - wRect.left);
+  const top  = Math.round(bRect.top  - wRect.top);
+  const w    = Math.round(bRect.width);
+  const h    = Math.round(bRect.height);
+
+  wrap.style.setProperty('--glide-left', left + 'px');
+  wrap.style.setProperty('--glide-top',  top  + 'px');
+  wrap.style.setProperty('--glide-w',    w    + 'px');
+  wrap.style.setProperty('--glide-h',    h    + 'px');
+
+  wrap.classList.add('has-glider'); 
+}
+
+const getNum = (el) => {
+  const n = parseInt(el.dataset.pid, 10);
+  return Number.isFinite(n) ? n : 1e9;
+};
+
+function showAll() {
+  cardById.forEach((el) => { el.style.display = ''; });
+
+  const sorted = Array.from(cardById.values()).sort((a,b) => getNum(a) - getNum(b));
+  const frag = document.createDocumentFragment();
+  sorted.forEach(el => frag.appendChild(el));
+  prodGrid.appendChild(frag);
+}
+
+function applyCategory(key) {
+  if (key === 'all') { showAll(); return; }
+
+  const want = CATEGORY_MAP[key] || [];
+  const frag = document.createDocumentFragment();
+
+  cardById.forEach((el) => { el.style.display = 'none'; });
+
+  want.forEach(id => {
+    const el = cardById.get(String(id));
+    if (el) {
+      el.style.display = '';
+      frag.appendChild(el);
+    }
+  });
+
+  prodGrid.appendChild(frag);
+}
+
+function onCatClick(e){
+  const btn = e.target.closest('button[data-key]');
+  if (!btn) return;
+
+  catsWrap.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+  const key = btn.dataset.key;
+
+  moveCategoryGlider(btn);
+  applyCategory(key);
+  requestAnimationFrame(updateScrollComp);
+}
+
+catsWrap.addEventListener('click', onCatClick);
+
+function resetProductsState(){
+  const catsWrap = document.getElementById('prodCats');
+  if (catsWrap){
+    const allBtn = catsWrap.querySelector('button[data-key="all"]');
+    if (allBtn){
+      catsWrap.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === allBtn));
+      applyCategory('all');
+      moveCategoryGlider(allBtn);
+    }else{
+      showAll();
+    }
+  }
+
+  document.querySelectorAll('#prodGrid .prod-card').forEach(card => {
+    if (card.classList.contains('static')) return;
+
+    const firstSw = card.querySelector('.prod-swatches .prod-swatch');
+    if (firstSw) firstSw.click();
+
+    const slider = card.querySelector('.prod-slider');
+    if (slider){
+      slider.classList.remove('fade');
+      const prev = slider.style.transition;
+      slider.style.transition = 'none';
+      slider.style.transform  = 'translate3d(-100%,0,0)';
+      slider.dataset.xIndex   = '1';
+      slider.offsetHeight;
+      slider.style.transition = prev || '';
+    }
+
+    const dots = card.querySelectorAll('.prod-dots .dot');
+    dots.forEach((d,i)=> d.classList.toggle('active', i===0));
+  });
+
+  if (typeof forceTop === 'function') forceTop();
+}
+
+let _glideRaf = 0;
+window.addEventListener('resize', () => {
+  if (_glideRaf) cancelAnimationFrame(_glideRaf);
+  _glideRaf = requestAnimationFrame(() => {
+    const activeBtn = document.querySelector('#prodCats button.active');
+    if (activeBtn) moveCategoryGlider(activeBtn);
+  });
+});
+
+showAll();
+ requestAnimationFrame(() => {
+   const activeBtn = catsWrap.querySelector('button.active');
+   if (!document.getElementById('products').hidden) {
+     moveCategoryGlider(activeBtn);
+   }
+ });
+
+function fadeSwap(fromEl, toEl, onDone){
+  if (fromEl === toEl) { onDone && onDone(); return; }
+
+  if (fromEl) fromEl.classList.remove('page-fade-out','page-fade-in');
+  toEl.classList.remove('page-fade-out','page-fade-in');
+
+  if (fromEl) fromEl.hidden = true;
+  toEl.hidden = false;
+
+  if (typeof onDone === 'function') onDone();
+}
+
+let _productsHydrated = false;
+function hydrateProductsImagesOnce(){
+  if (_productsHydrated) return;
+  _productsHydrated = true;
+  document.querySelectorAll('#prodGrid img[data-src]').forEach(observeLazy);
+}
+function show(id) {
+  if (window.isCustomTransition) return;
+  const secs = [...document.querySelectorAll('section')];
+  const siteNav  = document.querySelector('.site-nav');
+  const siteLogo = document.querySelector('.site-logo');
+
+  if (id !== 'intro' && id !== 'story') {
+    document.body.classList.remove('show-intro', 'show-story');
+    setHeaderVisible(true);
+  }
+
+const allowScroll = (id === 'products' || id === 'gallery');
+document.documentElement.style.overflowX = 'hidden';
+document.body.style.overflowX = 'hidden';
+document.documentElement.style.overflowY = allowScroll ? 'auto' : 'hidden';
+document.body.style.overflowY = allowScroll ? 'auto' : 'hidden';
+
+const showGlobalUI = (id === 'intro' || id === 'gallery' || id === 'products' || id === 'profile' || id === 'credits');
+  if (siteNav)  siteNav.style.display  = showGlobalUI ? '' : 'none';
+  if (siteLogo) siteLogo.style.display = showGlobalUI ? '' : 'none';
+if (showGlobalUI) document.body.classList.remove('hide-global-ui');
+
+  let current = secs.find(s => s.hidden !== true);
+
+  if (id === 'intro' || id === 'story') {
+    secs.forEach(sec => {
+      if (sec.id === 'intro' || sec.id === 'story') sec.hidden = false;
+      else sec.hidden = true;
+    });
+document.body.classList.toggle('show-intro', id === 'intro');
+    document.body.classList.toggle('show-story', id === 'story');
+
+   setHeaderVisible(id === 'intro');
+
+    if (id === 'intro') startIntroAutoPlay();
+    else stopIntroAutoPlay();
+
+  if (id === 'story') playStoryEnterAnim();
+
+    return;
+  }
+
+  const next = document.getElementById(id);
+  if (!next) return;
+
+fadeSwap(current, next, () => {
+  if (current && (current.id === 'intro' || current.id === 'story')) {
+    document.getElementById('intro').hidden = true;
+    document.getElementById('story').hidden = true;
+  }
+
+if (id === 'products') {
+  hydrateProductsImagesOnce();
+  resetProductsState();
+}
+
+if (id === 'intro') startIntroAutoPlay();
+else stopIntroAutoPlay();
+});
+}
+
+(() => {
+  if (window.__showDecorated) return;
+  window.__showDecorated = 1;
+  const _show = window.show;
+  if (typeof _show === 'function') {
+    window.show = function(id){
+      if (Transition.busy) return;
+      const r = _show.apply(this, arguments);
+      applyGlobalUIFor(id);
+      return r;
+    };
+  }
+})();
+
+const galleryGrid = document.getElementById('galleryGrid');
+galleryGrid.innerHTML = '';
+
+for (let i = 1; i <= 11; i++) {
+  const thumb = document.createElement('div');
+  thumb.className = 'thumb';
+thumb.dataset.look = i;
+
+
+  const base = document.createElement('img');
+  base.className = 'base-img';
+  base.alt = `Look ${i}`;
+base.src   = `images/look${i}-thumb.jpg`;
+base.sizes = '(max-width:780px) 50vw, (max-width:1200px) 33vw, 25vw';
+base.srcset = [400, 800, 1200, 1600]
+  .map(w => `${toCloudinaryPathWithWidth(`images/look${i}-thumb.jpg`, w)} ${w}w`)
+  .join(', ');
+
+tryCloudinary(base);
+
+const hover = document.createElement('img');
+hover.className = 'hover-img';
+hover.alt = '';
+hover.setAttribute('aria-hidden', 'true');
+
+const hoverLocal = `images/look${i}-thumb-hover.jpg`;
+const hoverCLD   = toCloudinaryPathWithWidth(hoverLocal, 800);
+
+hover.dataset.src = hoverCLD;    
+hover.dataset.noCld = '1';        
+let loadedHover = false;
+
+
+
+const ensureHoverLoaded = () => {
+  if (loadedHover) return;
+  loadedHover = true;
+
+  hover.src = hover.dataset.src;
+
+  const onErr = () => {
+    hover.removeEventListener('error', onErr);
+    hover.src = hoverLocal;
+  };
+  hover.addEventListener('error', onErr, { once: true });
+};
+
+thumb.addEventListener('mouseenter', ensureHoverLoaded);
+thumb.addEventListener('focus', ensureHoverLoaded);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'thumb-imgwrap';
+  wrap.appendChild(base);
+  wrap.appendChild(hover);
+
+  const cap = document.createElement('div');
+  cap.className = 'caption';
+  cap.textContent = `룩 ${i}/11`;
+
+  thumb.appendChild(wrap);
+  thumb.appendChild(cap);
+
+  galleryGrid.appendChild(thumb);
+}
+
+{
+  const cols = 4;
+  const remain = galleryGrid.children.length % cols;
+  if (remain !== 0) {
+    const fillers = cols - remain;
+    for (let k = 0; k < fillers; k++) {
+      const filler = document.createElement('div');
+      filler.className = 'thumb extra';
+      const img = document.createElement('img');
+      const local = 'images/gallery-filler.jpg';
+      const cld   = toCloudinaryPathWithWidth(local, 800);
+      img.src = local;
+      tryCloudinary(img);
+      img.alt = '';
+      img.setAttribute('aria-hidden', 'true');
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'contain';
+      filler.appendChild(img);
+      filler.style.aspectRatio = '3 / 4';
+
+      galleryGrid.appendChild(filler);
+    }
+  }
+}
+
+let isG2LAnimating = false;
+let isL2LAnimating = false;
+
+galleryGrid.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  return;
+});
+
+const INTRO_DUR   = 450; // ms (제품: 450ms)
+const INTRO_EASE  = 'cubic-bezier(.22,.61,.36,1)';
+
+let introIdx = 0;
+let introImg  = document.getElementById('introSlideImg');
+const introWrap = document.getElementById('introSlider');
+const prevDot   = introWrap.querySelector('.circle-btn.left');
+const nextDot   = introWrap.querySelector('.circle-btn.right');
+
+
+const introStage = document.createElement('div');
+introStage.className = 'intro-stage';
+
+introWrap.insertBefore(introStage, nextDot);
+
+introStage.appendChild(introImg);
+
+
+const introBlackout = document.createElement('div');
+introBlackout.className = 'intro-blackout';
+introStage.appendChild(introBlackout);
+
+let isIntroSliding = false;  
+let introSwapToken = 0;   
+let introQueuedStep = 0;     
+
+function getIntroCooldown(){
+  const rs   = getComputedStyle(document.documentElement);
+  const gap  = parseFloat(rs.getPropertyValue('--intro-gap'))     || 900;
+  const fade = parseFloat(rs.getPropertyValue('--intro-fade-in')) || 1300;
+  return Math.ceil(gap + fade + 120);
+}
+let lastIntroTick = 0;
+function withinIntroCooldown(){
+  return (performance.now() - lastIntroTick) < getIntroCooldown();
+}
+
+function startIntroCooldown(){
+  lastIntroTick = performance.now();
+}
+
+const introSlides = [
+  'images/intro1.jpg',
+  'images/intro2.jpg',
+  'images/intro3.jpg',
+  'images/intro4.jpg',
+  'images/intro5.jpg',
+  'images/intro6.jpg',
+  'images/intro7.jpg'
+];
+const introTuning = [
+  { scale: 1.20 }, // 1번
+  { scale: 0.90 }, // 2번
+  { scale: 0.45 }, // 3번 
+  { scale: 0.90 }, // 4번 
+  { scale: 0.80 }, // 5번 
+  { scale: 1.00 }, // 6번 
+  { scale: 0.70 }, // 7번 
+];
+
+function introTransform(xPercent, idx){
+  const t = introTuning[(idx + introSlides.length) % introSlides.length] || {};
+  const s = (t.scale ?? 1);
+  return `translate3d(-50%, -50%, 0) translateX(${xPercent}%) scale(${s})`;
+}
+
+function applyScale(img, idx){
+  const s = introTuning[(idx + introTuning.length) % introTuning.length]?.scale ?? 1;
+
+  img.style.maxWidth  = '100%';
+  img.style.maxHeight = '100%';
+  img.style.width  = 'auto';
+  img.style.height = 'auto';
+
+  img.style.transform = `translate(-50%, -50%) scale(${s})`;
+}
+
+
+function setIntroInitial(i){
+  const idx = (i + introSlides.length) % introSlides.length;
+  introImg.src = introSlides[idx];
+  introImg.classList.remove('is-hidden');
+  applyScale(introImg, idx);
+  introIdx = idx;
+  isIntroSliding = false;
+}
+setIntroInitial(0);
+
+async function slideIntro(step){
+  const dir = Math.sign(step) >= 0 ? 1 : -1;
+
+
+  if (isIntroSliding || withinIntroCooldown()){
+    introQueuedStep = dir;
+    return;
+  }
+
+  startIntroCooldown();
+  isIntroSliding = true;
+
+  const myToken = ++introSwapToken;
+  const nextIdx = (introIdx + dir + introSlides.length) % introSlides.length;
+
+  const nextImg = new Image();
+  nextImg.className = 'intro-slide-img is-hidden';
+  nextImg.src = introSlides[nextIdx];
+  applyScale(nextImg, nextIdx);
+
+  introStage.insertBefore(nextImg, introImg.nextSibling);
+
+  await new Promise(r => requestAnimationFrame(()=>requestAnimationFrame(r)));
+  if (myToken !== introSwapToken){ isIntroSliding = false; nextImg.remove(); return; }
+
+
+  introImg.classList.add('is-hidden');
+
+
+  const rs   = getComputedStyle(document.documentElement);
+  const GAP  = parseFloat(rs.getPropertyValue('--intro-gap')) || 900;
+  await new Promise(r => setTimeout(r, GAP));
+  if (myToken !== introSwapToken){ isIntroSliding = false; nextImg.remove(); return; }
+
+
+  nextImg.classList.remove('is-hidden');
+
+  const DUR = parseFloat(rs.getPropertyValue('--intro-fade-in')) || 1300;
+  setTimeout(() => {
+    if (myToken !== introSwapToken){ isIntroSliding = false; try{nextImg.remove();}catch{}; return; }
+    try { introImg.remove(); } catch(e){}
+    introImg = nextImg;
+    introIdx = nextIdx;
+    isIntroSliding = false;
+
+    if (introQueuedStep !== 0){
+      const queued = introQueuedStep;
+      introQueuedStep = 0;
+      slideIntro(queued);   
+    }
+  }, DUR + 40);
+}
+
+
+prevDot.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  slideIntro(-1);
+  resetIntroAutoPlay();   
+});
+nextDot.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  slideIntro(1);
+  resetIntroAutoPlay();   
+});
+
+
+let introAutoTimer = null;
+
+function startIntroAutoPlay(delay = 4000){
+  if (introAutoTimer) return;                              
+  if (!document.body.classList.contains('show-intro')) return; 
+  if (document.hidden) return;                             
+
+  introAutoTimer = setInterval(() => {
+    if (document.body.classList.contains('show-intro')) {
+      slideIntro(1);                                       
+    }
+  }, delay);
+}
+
+function stopIntroAutoPlay(){
+  if (introAutoTimer){
+    clearInterval(introAutoTimer);
+    introAutoTimer = null;
+  }
+}
+
+function resetIntroAutoPlay(delay = 5000){
+  stopIntroAutoPlay();
+  startIntroAutoPlay(delay);
+}
+
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden){
+    stopIntroAutoPlay();
+    return;
+  }
+
+  refreshLookIfVisible();
+  startIntroAutoPlay();
+});
+
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted){
+    refreshLookIfVisible();
+    startIntroAutoPlay();
+  }
+});
+
+
+document.getElementById('introStory').addEventListener('click', async (e)=>{
+  e.preventDefault();
+
+  const PRELOAD_TIMEOUT = 450; 
+  const wait = preloadAndDecode('images/story-banner.jpg');
+  await Promise.race([ wait, new Promise(res=>setTimeout(res, PRELOAD_TIMEOUT)) ]);
+
+  stopIntroAutoPlay();
+  document.body.classList.remove('show-intro');
+  document.body.classList.add('show-story');
+  setHeaderVisible(false);
+
+  playStoryEnterAnim();
+});
+
+document.querySelector('#story .story-back').addEventListener('click', ()=>{
+  document.body.classList.remove('show-story');
+  document.body.classList.add('show-intro');
+
+  setHeaderVisible(true);
+  startIntroAutoPlay(); 
+});
+
+/* Intro ↔ Story: wheel/touch 내비게이션 */
+(() => {
+  const active  = { capture: true, passive: false };
+  const passive = { capture: true, passive: true  };
+
+  let scrollLock = false;
+  const lock = (ms = 700) => { 
+    scrollLock = true;
+    setTimeout(() => { scrollLock = false; }, ms);
+  };
+
+const inIntro = () =>
+  document.body.classList.contains('show-intro') &&
+  !document.getElementById('intro')?.hidden;
+
+const inStory = () =>
+  document.body.classList.contains('show-story') &&
+  !document.getElementById('story')?.hidden;
+
+  const goStory = (e) => {
+    if (e) e.preventDefault();
+    if (!inIntro() || scrollLock) return;
+    document.getElementById('introStory')?.click();
+    lock();
+  };
+
+  const goIntro = (e) => {
+    if (e) e.preventDefault();
+    if (!inStory() || scrollLock) return;
+    document.querySelector('#story .story-back')?.click();
+    lock();
+  };
+
+  window.addEventListener('wheel', (e) => {
+    const dy = e.deltaY || 0;
+    if (inIntro() && dy > 25)  return goStory(e);
+    if (inStory() && dy < -25) return goIntro(e);
+  }, active);
+
+  let introStartY = null, storyStartY = null;
+
+  window.addEventListener('touchstart', (e) => {
+    const y = e.touches?.[0]?.clientY ?? null;
+    if (inIntro()) introStartY = y;
+    if (inStory()) storyStartY = y;
+  }, passive);
+
+  window.addEventListener('touchmove', (e) => {
+    const y = e.touches?.[0]?.clientY ?? null;
+    if (y == null) return;
+    if (inIntro() && introStartY != null && y - introStartY < -30)  return goStory(e);
+    if (inStory() && storyStartY != null && y - storyStartY >  30)  return goIntro(e);
+  }, active);
+
+  window.addEventListener('touchend', () => {
+    introStartY = storyStartY = null;
+  }, passive);
+})();
+
+document.querySelectorAll('.site-nav a').forEach(a => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const targetId = a.dataset.target;
+    if (targetId) pushSection(targetId);
+  });
+});
+
+      const lookInfo = [
+        {}, // 0 dummy
+        {outer:'클래식 히든버튼 울 재킷', top:'버튼다운 코튼 셔츠', bottom:'벨벳 포켓 울 쇼츠'},
+        {outer:'에폴렛 로우넥 캔버스 블루종', top:'V컷 캐시미어 카디건', bottom:'커프스 테일러드 울 팬츠'},
+        {outer:'쓰리쿼터 슬리브 니트 스웨터', top:'버튼다운 코튼 셔츠', bottom:'버튼플라이 트윌 팬츠'},
+        {outer:'로프 트리밍 레더 블루종', top:'로우넥 크롭 코튼 셔츠', bottom:'레더 스트랩 코튼 팬츠'},
+        {outer:'Erwan Bouroullec<br>아트워크 나일론 카디건', top:'버튼다운 코튼 셔츠', bottom:'레더 트리밍 스트랩 코튼 팬츠'},
+        {outer:'레더 배색 코튼 재킷', top:'null', bottom:'레더 트리밍 울 랩 스커트'},
+        {outer:'레더 트리밍 코튼 베스트', top:'Erwan Bouroullec<br>아트워크 포켓 티셔츠', bottom:'유틸리티 코튼 팬츠'},
+        {outer:'테일러드 3버튼 울 자켓', top:'버튼다운 코튼 셔츠', bottom:'테일러드 울 팬츠'},
+        {outer:'null', top:'코듀로이 패치 <br>밀리터리 니트 스웨터', bottom:'커프스 테일러드 팬츠'},
+        {outer:'에폴렛 레더 베스트 <br>및 개버딘 코트', top:'null', bottom:'코듀로이 카고 팬츠'},
+        {outer:'워크 디테일 코트', top:'로우넥 크롭 코튼 셔츠', bottom:'버튼플라이 트윌 팬츠'},
+      ];
+
+      const maxLook = 11;
+let currentLook = 1;
+
+const listCatalog = {
+  1: {
+    outer: {
+      name: '클래식 히든버튼 울 재킷',
+      variants: {
+        'blue': {
+          label: '애쉬 블루',
+          chip: '#444756',
+          images: [
+            'images/1-outer-1.jpg',
+            'images/1-outer-2.jpg'
+          ],
+          spec: `·  클래식 핏
+·  보트넥
+·  가슴 웰트 포켓
+·  전면 더블 웰트 포켓
+·  안감과 어깨 패드
+·  프론트 히든 버튼 클로저
+·  커프스 히든 버튼
+·  뒷 벤트
+
+혼용률
+·  겉감 80% 모 / 20% 모헤어
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        },
+        'gray': {
+          label: '플린트 그레이',
+          chip: '#60605F',
+          images: [
+            'images/1-outer-4.jpg',
+            'images/1-outer-5.jpg',
+            'images/1-outer-6.jpg'
+          ],
+          spec: ``
+        }
+      },
+      order: ['blue','gray'],
+      spec: `·  클래식 핏
+·  보트넥
+·  가슴 웰트 포켓
+·  전면 더블 웰트 포켓
+·  안감과 어깨 패드
+·  프론트 히든 버튼 클로저
+·  커프스 히든 버튼
+·  뒷 벤트
+
+혼용률
+·  겉감 100% 모
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+    },
+    top: {
+      name: '버튼다운 코튼 셔츠',
+      variants: {
+        'white': {
+          label: '화이트',
+          chip: '#F1F1F1',
+          images: [
+            'images/1-top-1.jpg',
+            'images/1-top-2.jpg',
+            'images/1-top-3.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  더블 버튼 다운 칼라
+·  라운드 밑단
+·  마이터드 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        },
+        'gray': {
+          label: '뉴트럴 그레이',
+          chip: '#A5A5A5',
+          images: [
+            'images/1-top-4.jpg',
+            'images/1-top-5.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  더블 버튼 다운 칼라
+·  라운드 밑단
+·  마이터드 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['white','gray'],
+    },
+    bottom: {
+      name: '벨벳 포켓 울 쇼츠',
+      variants: {
+        'blue': {
+          label: '애쉬 블루/네이비',
+          chip: '#444756',
+          images: [
+            'images/1-bottom-1.jpg',
+            'images/1-bottom-2.jpg',
+            'images/1-bottom-3.jpg'
+          ],
+          spec: `·  프론트 후크 및 지퍼 플라이
+·  측면 패치 포켓
+·  안감
+·  후면 ouvrier 라벨
+
+혼용률
+·  겉감 80% 모 / 20% 모헤어
+   벨벳 87% 레이온 /  13% 견
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        },
+        'gray': {
+          label: '플린트 그레이/블랙',
+          chip: '#60605F',
+          images: [
+            'images/1-bottom-4.jpg',
+            'images/1-bottom-5.jpg'
+          ],
+          spec: `·  프론트 후크 및 지퍼 플라이
+·  측면 패치 포켓
+·  안감
+·  후면 ouvrier 라벨
+
+혼용률
+·  겉감 100% 모
+    벨벳 87% 레이온 /  13% 견
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['blue','gray'],
+    }
+  },
+
+  /* ===== Look 2 ===== */
+  2: {
+    outer: {
+      name: '에폴렛 로우넥 캔버스 블루종',
+      variants: {
+        'beige': {
+          label: '샌드',
+          chip: '#908978',
+          images: [
+            'images/2-outer-1.jpg',
+            'images/2-outer-2.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  캔버스 조직
+·  로우 넥 및 포인트 칼라
+·  드롭숄더 및 에폴렛
+·  전면 웰트 포켓
+·  안감
+·  립 조직 커프스 및 밑단
+·  프론트 지퍼 클로저
+·  RACCAGNI 지퍼
+
+혼용률
+·  겉감 100% 면
+·  안감 100% 면
+
+제조국 : 이탈리아`
+        },
+        'black': {
+          label: '블랙',
+          chip: '#262728',
+          images: [
+            'images/2-outer-4.jpg',
+            'images/2-outer-5.jpg',
+            'images/2-outer-6.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  캔버스 조직
+·  로우 넥 및 포인트 칼라
+·  드롭숄더 및 에폴렛
+·  전면 웰트 포켓
+·  안감
+·  립 조직 커프스 및 밑단
+·  프론트 지퍼 클로저
+·  RACCAGNI 지퍼
+
+혼용률
+·  겉감 100% 면
+·  안감 100% 면
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['beige','black'],
+    },
+    top: {
+      name: 'V컷 캐시미어 카디건',
+      variants: {
+        'maroon': {
+          label: '마룬',
+          chip: '#3E1424',
+          images: [
+            'images/2-top-1.jpg',
+            'images/2-top-2.jpg',
+            'images/2-top-3.jpg'
+          ],
+          spec: `·  플레인 니트
+·  레귤러 핏
+·  립 조직 크루넥
+·  넥 및 밑단에 V자 트임
+·  밑단 ouvrier 라벨
+·  전면 자개 버튼 여밈
+·  립 조직 커프스 및 밑단
+
+혼용률
+·  겉감 100% 캐시미어
+
+제조국 : 이탈리아`
+        },
+        'gray': {
+          label: '슬레이트 그레이',
+          chip: '#5E5D60',
+          images: [
+            'images/2-top-4.jpg',
+            'images/2-top-5.jpg'
+          ],
+          spec: `·  플레인 니트
+·  레귤러 핏
+·  립 조직 크루넥
+·  넥 및 밑단에 V자 트임
+·  밑단 ouvrier 라벨
+·  전면 자개 버튼 여밈
+·  립 조직 커프스 및 밑단
+
+혼용률
+·  겉감 100% 캐시미어
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['maroon','gray'],
+    },
+    bottom: {
+      name: '커프스 테일러드 울 팬츠',
+      variants: {
+        'blue': {
+          label: '글렌 체크',
+          chip: '#21262E',
+          images: [
+            'images/2-bottom-1.jpg',
+            'images/2-bottom-2.jpg'
+          ],
+          spec: `·  와이드 핏
+·  슬래시 포켓
+·  후면 버튼 웰트 포켓
+·  밑단 배색 카브라 
+·  프론트 후크 및 지퍼 플라이
+
+혼용률
+·  겉감 90% 모 10% 모헤어
+   밑단 100% 면
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        },
+        'black': {
+          label: '블랙',
+          chip: '#171717',
+          images: [
+            'images/2-bottom-4.jpg',
+            'images/2-bottom-5.jpg',
+            'images/2-bottom-6.jpg'
+          ],
+          spec: `·  와이드 핏
+·  슬래시 포켓
+·  후면 버튼 웰트 포켓
+·  밑단 배색 카브라 
+·  프론트 후크 및 지퍼 플라이
+
+혼용률
+·  겉감 100% 모
+   밑단 100% 면
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['blue','black'],
+    }
+  },
+
+  /* ===== Look 3 ===== */
+  3: {
+    outer: {
+      name: '쓰리쿼터 슬리브 니트 스웨터',
+      variants: {
+        'brown': {
+          label: '브라운/토프',
+          chip: '#382D26',
+          images: [
+            'images/3-outer-1.jpg',
+            'images/3-outer-2.jpg'
+          ],
+          spec: `·  플레인 니트
+·  크롭 핏
+·  V넥
+·  7부 슬리브
+·  전면 스트라이프 배색
+·  립 조직 커프스 및 밑단
+
+혼용률
+·  겉감 60% 모 / 40% 캐시미어
+
+제조국 : 포르투갈`
+        },
+        'gray': {
+          label: '차콜 그레이/블랙',
+          chip: '#2F302F',
+          images: [
+            'images/3-outer-4.jpg',
+            'images/3-outer-5.jpg',
+            'images/3-outer-6.jpg'
+          ],
+          spec: `·  플레인 니트
+·  크롭 핏
+·  V넥
+·  7부 슬리브
+·  전면 스트라이프 배색
+·  립 조직 커프스 및 밑단
+
+혼용률
+·  겉감 60% 모 / 40% 캐시미어
+
+제조국 : 포르투갈`
+        }
+      },
+      order: ['brown','gray'],
+    },
+    top: {
+      name: '버튼다운 코튼 셔츠',
+      variants: {
+        'gray': {
+          label: '웜 그레이',
+          chip: '#837E7F',
+          images: [
+            'images/3-top-1.jpg',
+            'images/3-top-2.jpg',
+            'images/3-top-3.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  더블 버튼 다운 칼라
+·  라운드 밑단
+·  마이터드 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        },
+        'white': {
+          label: '화이트',
+          chip: '#F1F1F1',
+          images: [
+            'images/3-top-4.jpg',
+            'images/3-top-5.jpg',
+            'images/3-top-6.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  더블 버튼 다운 칼라
+·  라운드 밑단
+·  마이터드 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        },
+        'navy': {
+          label: '네이비',
+          chip: '#161C25',
+          images: [
+            'images/3-top-7.jpg',
+            'images/3-top-8.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  더블 버튼 다운 칼라
+·  라운드 밑단
+·  마이터드 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['gray','white','navy'],
+    },
+    bottom: {
+      name: '버튼플라이 트윌 팬츠',
+      variants: {
+        'black': {
+          label: '블랙',
+          chip: '#181818',
+          images: [
+            'images/3-bottom-1.jpg',
+            'images/3-bottom-2.jpg'
+          ],
+          spec: `·  스트레이트 핏
+·  트윌 조직
+·  프론트 후크 및 버튼 플라이
+·  5 포켓
+·  후면 패치 포켓
+·  소뿔 버튼
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        },
+        'blue': {
+          label: '미드나잇 블루',
+          chip: '#151932',
+          images: [
+            'images/3-bottom-4.jpg',
+            'images/3-bottom-5.jpg',
+            'images/3-bottom-6.jpg'
+          ],
+          spec: `·  스트레이트 핏
+·  트윌 조직
+·  프론트 후크 및 버튼 플라이
+·  5 포켓
+·  후면 패치 포켓
+·  소뿔 버튼
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['black','blue'],
+    }
+  },
+
+  /* ===== Look 4 ===== */
+  4: {
+    outer: {
+      name: '로프 트리밍 레더 블루종',
+      variants: {
+        'white': {
+          label: '오프 화이트',
+          chip: '#E6E5E3',
+          images: [
+            'images/4-outer-1.jpg',
+            'images/4-outer-2.jpg',
+            'images/4-outer-3.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  워싱 가공
+·  셔츠 칼라
+·  가슴 및 전면 웰트 포켓
+·  포켓 가죽 로프 장식
+·  후면 행거 루프
+·  프론트 버튼 클로저
+·  소매 및 밑단 밴딩
+
+혼용률
+·  겉감 100% 양가죽
+   장식 100% 소가죽
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        },
+        'brown': {
+          label: '다크 브라운',
+          chip: '#302928',
+          images: [
+            'images/4-outer-4.jpg',
+            'images/4-outer-5.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  워싱 가공
+·  셔츠 칼라
+·  가슴 및 전면 웰트 포켓
+·  포켓 가죽 로프 장식
+·  후면 행거 루프
+·  프론트 버튼 클로저
+·  소매 및 밑단 밴딩
+
+혼용률
+·  겉감 100% 양가죽
+   장식 100% 소가죽
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['white','brown'],
+    },
+    top: {
+      name: '로우넥 크롭 코튼 셔츠',
+      variants: {
+        'khaki': {
+          label: '카키',
+          chip: '#636859',
+          images: [
+            'images/4-top-1.jpg',
+            'images/4-top-2.jpg',
+            'images/4-top-3.jpg'
+          ],
+          spec: `·  크롭 핏
+·  로우 넥 및 포인트 칼라
+·  가슴 웰트 포켓
+·  라운드 밑단
+·  후면 ouvrier 라벨
+·  스냅 버튼 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 포르투갈`
+        },
+        'white': {
+          label: '화이트',
+          chip: '#E2E5EC',
+          images: [
+            'images/4-top-4.jpg',
+            'images/4-top-5.jpg'
+          ],
+          spec: `·  크롭 핏
+·  로우 넥 및 포인트 칼라
+·  가슴 웰트 포켓
+·  라운드 밑단
+·  후면 ouvrier 라벨
+·  스냅 버튼 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 포르투갈`
+        }
+      },
+      order: ['khaki','white'],
+    },
+    bottom: {
+      name: '레더 스트랩 코튼 팬츠',
+      variants: {
+        'black': {
+          label: '차콜 블랙',
+          chip: '#1C1D1D',
+          images: [
+            'images/4-bottom-1.jpg',
+            'images/4-bottom-2.jpg',
+            'images/4-bottom-3.jpg'
+          ],
+          spec: `·  스트레이트 핏
+·  트윌 조직
+·  사이드 더블 웰트 포켓
+·  조절 가능한 측면 가죽 벨트 스트랩
+·  프론트 후크 및 버튼 플라이
+·  후면 플랩 포켓
+·  소뿔 버튼
+
+혼용률
+·  겉감 100% 면
+   스트랩 100% 소가죽
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['black'],
+    }
+  },
+
+  /* ===== Look 5 ===== */
+  5: {
+    outer: {
+      name: 'Erwan Bouroullec 아트워크 나일론 카디건',
+      variants: {
+        'navy': {
+          label: '네이비',
+          chip: '#2A2A39',
+          images: [
+            'images/5-outer-1.jpg',
+            'images/5-outer-2.jpg',
+            'images/5-outer-3.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  Erwan Bouroullec 아트워크 프린트
+·  V넥
+·  전면 버튼 플랩 포켓
+·  안감 및 패딩 처리
+·  프론트 자개 버튼 클로저
+
+혼용률
+·  겉감 100% 폴리아미드
+·  안감 100% 폴리아미드
+
+제조국 : 포르투갈`
+        },
+        'brown': {
+          label: '다크 브라운',
+          chip: '#251D18',
+          images: [
+            'images/5-outer-4.jpg',
+            'images/5-outer-5.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  Erwan Bouroullec 아트워크 프린트
+·  V넥
+·  전면 버튼 플랩 포켓
+·  안감 및 패딩 처리
+·  프론트 자개 버튼 클로저
+
+혼용률
+·  겉감 100% 폴리아미드
+·  안감 100% 폴리아미드
+
+제조국 : 포르투갈`
+        }
+      },
+      order: ['navy','brown'],
+    },
+    top: {
+      name: '버튼다운 코튼 셔츠',
+      variants: {
+        'navy': {
+          label: '네이비',
+          chip: '#161C25',
+          images: [
+            'images/3-top-7.jpg',
+            'images/3-top-8.jpg',
+          ],
+          spec: `·  레귤러 핏
+·  더블 버튼 다운 칼라
+·  라운드 밑단
+·  마이터드 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        },
+        'white': {
+          label: '화이트',
+          chip: '#F1F1F1',
+          images: [
+            'images/3-top-4.jpg',
+            'images/3-top-5.jpg',
+            'images/3-top-6.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  더블 버튼 다운 칼라
+·  라운드 밑단
+·  마이터드 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        },
+        'gray': {
+          label: '웜 그레이',
+          chip: '#837E7F',
+          images: [
+            'images/3-top-1.jpg',
+            'images/3-top-2.jpg',
+            'images/3-top-3.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  더블 버튼 다운 칼라
+·  라운드 밑단
+·  마이터드 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['navy','white','gray'],
+    },
+    bottom: {
+      name: '레더 트리밍 스트랩 코튼 팬츠',
+      variants: {
+        'gray': {
+          label: '차콜/내추럴',
+          chip: '#36373D',
+          images: [
+            'images/5-bottom-1.jpg',
+            'images/5-bottom-2.jpg',
+            'images/5-bottom-3.jpg'
+          ],
+          spec: `·  와이드 핏
+·  슬래시 포켓
+·  원턱
+·  전면 가죽 밴드 장식 
+·  조절 가능한 측면 가죽 벨트 스트랩
+·  프론트 후크 및 지퍼 플라이
+·  후면 패치 포켓
+
+혼용률
+·  겉감 100% 면
+   스트랩 및 장식 100% 소가죽
+
+제조국 : 이탈리아`
+        },
+        'denim': {
+          label: '인디고/블랙',
+          chip: '#536670',
+          images: [
+            'images/5-bottom-4.jpg',
+            'images/5-bottom-5.jpg'
+          ],
+          spec: `·  와이드 핏
+·  블리치 워싱 가공
+·  슬래시 포켓
+·  원턱
+·  전면 가죽 밴드 장식
+·  조절 가능한 측면 가죽 벨트 스트랩
+·  프론트 후크 및 지퍼 플라이
+·  후면 패치 포켓
+
+혼용률
+·  겉감 100% 면
+   스트랩 및 장식 100% 소가죽
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['gray','denim'],
+    }
+  },
+
+  /* ===== Look 6 ===== */
+  6: {
+    outer: {
+      name: '레더 배색 코튼 재킷',
+      variants: {
+        'white': {
+          label: '화이트/라이트 그레이',
+          chip: '#FFFFFF',
+          images: [
+            'images/6-outer-1.jpg',
+            'images/6-outer-2.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  워싱 가공
+·  셔츠 칼라
+·  전면 버튼 패치 포켓
+·  가죽 요크
+·  후면 트러커 스타일 스티치
+·  프론트 버튼 클로저
+·  커프스 버튼
+
+혼용률
+·  겉감 100% 면
+   어깨 100% 양가죽
+
+제조국 : 이탈리아`
+        },
+        'brown': {
+          label: '다크 브라운/스톤',
+          chip: '#251E1A',
+          images: [
+            'images/6-outer-4.jpg',
+            'images/6-outer-5.jpg',
+            'images/6-outer-6.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  워싱 가공
+·  셔츠 칼라
+·  전면 버튼 패치 포켓
+·  가죽 요크
+·  후면 트러커 스타일 스티치
+·  프론트 버튼 클로저
+·  커프스 버튼
+
+혼용률
+·  겉감 100% 면
+   어깨 100% 양가죽
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['white','brown'],
+    },
+    bottom: {
+      name: '레더 트리밍 울 랩 스커트',
+      variants: {
+        'blue': {
+          label: '글렌 체크/화이트',
+          chip: '#353A42',
+          images: [
+            'images/6-bottom-1.jpg',
+            'images/6-bottom-2.jpg',
+            'images/6-bottom-3.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  사이드 더블 웰트 포켓
+·  가죽 밴드 장식 
+·  프론트 스냅 버튼 클로저
+·  후면 ouvrier 라벨
+
+혼용률
+·  겉감 90% 모 10% 모헤어
+   장식 100% 소가죽
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        },
+        'black': {
+          label: '블랙/내추럴',
+          chip: '#1C1D1D',
+          images: [
+            'images/6-bottom-4.jpg',
+            'images/6-bottom-5.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  사이드 더블 웰트 포켓
+·  가죽 밴드 장식 
+·  프론트 스냅 버튼 클로저
+·  후면 ouvrier 라벨
+
+혼용률
+·  겉감 100% 모
+   장식 100% 소가죽
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['blue','black'],
+    }
+  },
+
+  /* ===== Look 7 ===== */
+  7: {
+    outer: {
+      name: '레더 트리밍 코튼 베스트',
+      variants: {
+        'blue': {
+          label: '애쉬 블루/화이트',
+          chip: '#4D505E',
+          images: [
+            'images/7-outer-1.jpg',
+            'images/7-outer-2.jpg',
+            'images/7-outer-3.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  전면 더블 웰트 포켓
+·  안감 ouvrier 라벨
+·  하단 가죽 밴드 장식
+·  안감 및 패딩 처리
+·  후면 행거 루프
+·  프론트 스냅 버튼 클로저
+
+혼용률
+·  겉감 100% 면
+   장식 100% 소가죽
+·  안감 100% 면
+
+제조국 : 포르투갈`
+        },
+        'brown': {
+          label: '브라운/내추럴',
+          chip: '#322B26',
+          images: [
+            'images/7-outer-4.jpg',
+            'images/7-outer-5.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  전면 더블 웰트 포켓
+·  안감 ouvrier 라벨
+·  하단 가죽 밴드 장식
+·  안감 및 패딩 처리
+·  후면 행거 루프
+·  프론트 스냅 버튼 클로저
+
+혼용률
+·  겉감 100% 면
+   장식 100% 소가죽
+·  안감 100% 면
+
+제조국 : 포르투갈`
+        }
+      },
+      order: ['blue','brown'],
+    },
+    top: {
+      name: 'Erwan Bouroullec 아트워크 포켓 티셔츠',
+      variants: {
+        'white': {
+          label: '화이트',
+          chip: '#EEEFF3',
+          images: [
+            'images/7-top-1.jpg',
+            'images/7-top-2.jpg',
+            'images/7-top-3.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  Erwan Bouroullec 아트워크 프린트
+·  크루넥
+·  짧은 슬리브
+·  가슴 패치 포켓
+·  소매 ouvrier 라벨
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 포르투갈`
+        }
+      },
+      order: ['white'],
+    },
+    bottom: {
+      name: '유틸리티 코튼 팬츠',
+      variants: {
+        'beige': {
+          label: '그리지',
+          chip: '#938D84',
+          images: [
+            'images/7-bottom-1.jpg',
+            'images/7-bottom-2.jpg'
+          ],
+          spec: `·  스트레이트 핏
+·  트윌 조직
+·  사이드 더블 웰트 포켓
+·  좌측 버튼 플랩 포켓
+·  조절 가능한 측면 어드저스터
+·  전면 핀턱
+·  프론트 버튼 및 지퍼 플라이
+·  후면 더블 웰트 포켓
+·  소뿔 버튼
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 포르투갈`
+        },
+        'black': {
+          label: '워시드 블랙',
+          chip: '#181717',
+          images: [
+            'images/7-bottom-4.jpg',
+            'images/7-bottom-5.jpg',
+            'images/7-bottom-6.jpg'
+          ],
+          spec: `·  스트레이트 핏
+·  워싱 가공
+·  트윌 조직
+·  사이드 더블 웰트 포켓
+·  좌측 버튼 플랩 포켓
+·  조절 가능한 측면 어드저스터
+·  전면 핀턱
+·  프론트 버튼 및 지퍼 플라이
+·  후면 더블 웰트 포켓
+·  소뿔 버튼
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 포르투갈`
+        }
+      },
+      order: ['beige','black'],
+    }
+  },
+
+  /* ===== Look 8 ===== */
+  8: {
+    outer: {
+      name: '테일러드 3버튼 울 자켓',
+      variants: {
+        'blue': {
+          label: '애쉬 블루',
+          chip: '#444756',
+          images: [
+            'images/8-outer-1.jpg',
+            'images/8-outer-2.jpg',
+            'images/8-outer-3.jpg'
+          ],
+          spec: `·  클래식 핏
+·  피크드 라펠 및 버튼 고정
+·  가슴 웰트 포켓
+·  전면 플랩 포켓
+·  자개 및 소뿔 버튼
+·  안감과 어깨 패드
+·  전면 ouvrier 라벨
+·  프론트 쓰리 버튼 클로저
+·  커프스 포 버튼과 장식 스티치
+·  뒷 벤트와 장식 스티치
+
+혼용률
+·  겉감 80% 모 / 20% 모헤어
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        },
+        'gray': {
+          label: '플린트 그레이',
+          chip: '#60605F',
+          images: [
+            'images/8-outer-4.jpg',
+            'images/8-outer-5.jpg'
+          ],
+          spec: `·  클래식 핏
+·  피크드 라펠 및 버튼 고정
+·  가슴 웰트 포켓
+·  전면 플랩 포켓
+·  자개 및 소뿔 버튼
+·  안감과 어깨 패드
+·  전면 ouvrier 라벨
+·  프론트 쓰리 버튼 클로저
+·  커프스 포 버튼과 장식 스티치
+·  뒷 벤트와 장식 스티치
+
+혼용률
+·  겉감 100% 모
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['blue','gray'],
+    },
+    top: {
+      name: '버튼다운 코튼 셔츠',
+      variants: {
+        'white': {
+          label: '화이트',
+          chip: '#F1F1F1',
+          images: [
+            'images/3-top-4.jpg',
+            'images/3-top-5.jpg',
+            'images/3-top-6.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  더블 버튼 다운 칼라
+·  라운드 밑단
+·  마이터드 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        },
+        'gray': {
+          label: '웜 그레이',
+          chip: '#837E7F',
+          images: [
+            'images/3-top-1.jpg',
+            'images/3-top-2.jpg',
+            'images/3-top-3.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  더블 버튼 다운 칼라
+·  라운드 밑단
+·  마이터드 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        },
+        'navy': {
+          label: '네이비',
+          chip: '#161C25',
+          images: [
+            'images/3-top-7.jpg',
+            'images/3-top-8.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  더블 버튼 다운 칼라
+·  라운드 밑단
+·  마이터드 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['white','gray','navy'],
+    },
+    bottom: {
+      name: '테일러드 울 팬츠',
+      variants: {
+        'blue': {
+          label: '애쉬 블루',
+          chip: '#444756',
+          images: [
+            'images/8-bottom-1.jpg',
+            'images/8-bottom-2.jpg'
+          ],
+          spec: `·  와이드 핏
+·  슬래시 포켓
+·  후면 웰트 포켓
+·  밑단 패치 밴드 
+·  프론트 후크,버튼 및 지퍼 플라이
+·  후면 ouvrier 라벨
+
+혼용률
+·  겉감 80% 모 / 20% 모헤어
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        },
+        'gray': {
+          label: '플린트 그레이',
+          chip: '#60605F',
+          images: [
+            'images/8-bottom-4.jpg',
+            'images/8-bottom-5.jpg',
+            'images/8-bottom-6.jpg'
+          ],
+          spec: `·  와이드 핏
+·  슬래시 포켓
+·  후면 웰트 포켓
+·  밑단 패치 밴드
+·  프론트 후크,버튼 및 지퍼 플라이
+·  후면 ouvrier 라벨
+
+혼용률
+·  겉감 100% 모
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['blue','gray'],
+    }
+  },
+
+  /* ===== Look 9 ===== */
+  9: {
+    top: {
+      name: '코듀로이 패치 밀리터리 니트 스웨터',
+      variants: {
+        'black': {
+          label: '블랙',
+          chip: '#181818',
+          images: [
+            'images/9-top-1.jpg',
+            'images/9-top-2.jpg',
+            'images/9-top-3.jpg'
+          ],
+          spec: `·  플레인 니트
+·  크롭 핏
+·  V넥
+·  어깨 코듀로이 패치
+·  가슴 패치 포켓
+·  립 조직 커프스 및 밑단
+
+혼용률
+·  겉감 100% 캐시미어
+   코듀로이 78% 면 / 20% 모달 / 2% 엘라스틴
+
+제조국 : 포르투갈`
+        }
+      },
+      order: ['black'],
+    },
+    bottom: {
+      name: '커프스 테일러드 팬츠',
+      variants: {
+        'gray': {
+          label: '다크 멜란지',
+          chip: '#3C3E3F',
+          images: [
+            'images/9-bottom-1.jpg',
+            'images/9-bottom-2.jpg',
+            'images/9-bottom-3.jpg'
+          ],
+          spec: `·  와이드 핏
+·  슬래시 포켓
+·  후면 버튼 웰트 포켓
+·  밑단 배색 카브라 
+·  프론트 후크 및 지퍼 플라이
+
+혼용률
+·  겉감 100% 울
+   밑단 100% 울
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        },
+        'navy': {
+          label: '네이비',
+          chip: '#181E2D',
+          images: [
+            'images/9-bottom-4.jpg',
+            'images/9-bottom-5.jpg'
+          ],
+          spec: `·  와이드 핏
+·  개버딘 조직
+·  슬래시 포켓
+·  후면 버튼 웰트 포켓
+·  밑단 배색 카브라 
+·  프론트 후크 및 지퍼 플라이
+
+혼용률
+·  겉감 100% 면
+   밑단 100% 면
+·  안감 100% 큐프로
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['gray','navy'],
+      spec:
+        '레귤러/크롭 핏\nRiri 사이드 지퍼 핸드 포켓\nRiri 투웨이 지퍼 여밈\n이탈리아산 식물성 태닝 램스킨\n\n겉감: 램스킨 100%\n안감: 쿠프로 100%\n트림(배색): 면 95%, 엘라스테인 5%\n\n취급 주의\n가죽은 전문 드라이클리너에 맡기십시오.\n물세탁 금지\n표백제 사용 금지\n기계 건조 금지\n비틀어 짜지 마십시오.'
+    }
+  },
+
+  /* ===== Look 10 ===== */
+  10: {
+    outer: {
+      name: '에폴렛 레더 베스트 및 개버딘 코트',
+      variants: {
+        'beige': {
+          label: '베이지/블랙',
+          chip: '#888078',
+          images: [
+            'images/10-outer-1.jpg',
+            'images/10-outer-2.jpg',
+            'images/10-outer-3.jpg',
+            'images/10-outer-6.jpg',
+            'images/10-outer-7.jpg'
+          ],
+          spec: `베스트
+
+·  탈부착 가능
+·  에폴렛
+·  가슴 웰트 포켓
+·  하단 스냅 버튼 플랩 포켓
+·  프론트 스냅 버튼 클로저
+·  스냅 버튼 벨트 루프
+
+혼용률
+·  겉감 100% 양가죽 / 100% 면
+·  안감 100% 면
+
+제조국 : 이탈리아`,
+          spec2: `코트
+
+·  레귤러 핏
+·  개버딘 조직
+·  셔츠 칼라
+·  전면 웰트 포켓
+·  후면 행거 루프
+·  프론트 버튼 클로저
+·  스트랩 및 버튼 소매
+·  뒷 벤트`
+        },
+        'navy': {
+          label: '네이비/화이트',
+          chip: '#1E2332',
+          images: [
+            'images/10-outer-4.jpg',
+            'images/10-outer-5.jpg',
+            'images/10-outer-8.jpg',
+            'images/10-outer-9.jpg'
+          ],
+          spec: `베스트
+
+·  탈부착 가능
+·  에폴렛
+·  가슴 웰트 포켓
+·  하단 스냅 버튼 플랩 포켓
+·  프론트 스냅 버튼 클로저
+·  스냅 버튼 벨트 루프
+
+혼용률
+·  겉감 100% 양가죽 / 100% 면
+·  안감 100% 면
+
+제조국 : 이탈리아`,
+          spec2: `코트
+
+·  레귤러 핏
+·  개버딘 조직
+·  셔츠 칼라
+·  전면 웰트 포켓
+·  후면 행거 루프
+·  프론트 버튼 클로저
+·  스트랩 및 버튼 소매
+·  뒷 벤트`
+        }
+      },
+      order: ['beige','navy'],
+    },
+    bottom: {
+      name: '코듀로이 카고 팬츠',
+      variants: {
+        'brown': {
+          label: '토프',
+          chip: '#494743',
+          images: [
+            'images/10-bottom-1.jpg',
+            'images/10-bottom-2.jpg',
+            'images/10-bottom-3.jpg'
+          ],
+          spec: `·  스트레이트 핏
+·  슬래시 포켓
+·  우측 지퍼 및 패치 포켓
+·  좌측 버튼 플랩 포켓  
+·  프론트 버튼 및 지퍼 플라이
+·  후면 버튼 플랩 포켓
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['brown'],
+    }
+  },
+
+  /* ===== Look 11 ===== */
+  11: {
+    outer: {
+      name: '워크 디테일 코트',
+      variants: {
+        'white': {
+          label: '오프 화이트',
+          chip: '#EFEEED',
+          images: [
+            'images/11-outer-1.jpg',
+            'images/11-outer-2.jpg',
+            'images/11-outer-3.jpg'
+          ],
+          spec: `·  레귤러 핏
+·  트윌 조직
+·  워싱 가공
+·  테일러드 칼라
+·  가슴 및 전면 패치 포켓
+·  조절 가능한 허리 끈
+·  프론트 스냅 버튼 클로저
+·  뒷 벤트
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['white'],
+    },
+    top: {
+      name: '로우넥 크롭 코튼 셔츠',
+      variants: {
+        'check': {
+          label: '그레이 블루',
+          chip: '#AAAEBE',
+          images: [
+            'images/11-top-1.jpg',
+            'images/11-top-2.jpg',
+            'images/11-top-3.jpg'
+          ],
+          spec: `·  크롭 핏
+·  로우 넥 및 포인트 칼라
+·  가슴 웰트 포켓
+·  라운드 밑단
+·  후면 ouvrier 라벨
+·  스냅 버튼 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 포르투갈`
+        },
+        'yellow': {
+          label: '카나리',
+          chip: '#D9D2BC',
+          images: [
+            'images/11-top-4.jpg',
+            'images/11-top-5.jpg'
+          ],
+          spec: `·  크롭 핏
+·  로우 넥 및 포인트 칼라
+·  가슴 웰트 포켓
+·  라운드 밑단
+·  후면 ouvrier 라벨
+·  스냅 버튼 커프스
+·  전면 자개 버튼 여밈
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 포르투갈`
+        }
+      },
+      order: ['check','yellow'],
+    },
+    bottom: {
+      name: '버튼플라이 트윌 팬츠',
+      variants: {
+        'blue': {
+          label: '네이비 블루',
+          chip: '#151932',
+          images: [
+            'images/3-bottom-4.jpg',
+            'images/3-bottom-5.jpg',
+            'images/3-bottom-6.jpg'
+          ],
+          spec: `·  스트레이트 핏
+·  트윌 조직
+·  프론트 후크 및 버튼 플라이
+·  5 포켓
+·  후면 패치 포켓
+·  소뿔 버튼
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        },
+        'black': {
+          label: '블랙',
+          chip: '#181818',
+          images: [
+            'images/3-bottom-1.jpg',
+            'images/3-bottom-2.jpg'
+          ],
+          spec: `·  스트레이트 핏
+·  트윌 조직
+·  프론트 후크 및 버튼 플라이
+·  5 포켓
+·  후면 패치 포켓
+·  소뿔 버튼
+
+혼용률
+·  겉감 100% 면
+
+제조국 : 이탈리아`
+        }
+      },
+      order: ['blue','black'],
+    }
+  }
+};
+
+let isLookAnimating = false;
+let pendingStepLook = 0; 
+let pendingLookDir = 0;
+function stepLook(dir){
+  if (window.isLookTransitioning) {
+    pendingLookDir = dir;
+    return;
+  }
+  const next = Math.min(maxLook, Math.max(1, currentLook + dir));
+  if (next === currentLook) return;
+
+  currentLook = next;
+  renderLookMeta(currentLook);
+  scheduleLookCommit();
+  if (typeof startLookCooldown === 'function') startLookCooldown();
+}
+
+const imgA = document.getElementById('lookImgA');
+const imgB = document.getElementById('lookImgB');
+let onA = true;
+
+const prevBtn   = document.getElementById('prev');
+const nextBtn   = document.getElementById('next');
+const lookText  = document.getElementById('look-text');
+const rightPanel= document.getElementById('right-panel');
+
+function updateLookHeader(n){
+  const max = maxLook;
+  const prevBtn  = document.getElementById('prev');
+  const nextBtn  = document.getElementById('next');
+  const lookText = document.getElementById('look-text');
+
+  if (prevBtn) prevBtn.classList.toggle('disabled', n === 1);
+  if (nextBtn) nextBtn.classList.toggle('disabled', n === max);
+  if (lookText) {
+    lookText.textContent = `Look ${n}/${max}`;
+  }
+}
+
+function renderLookMeta(n){
+ if (lookText && lookText.textContent === `Look ${n}/${maxLook}` && rightPanel?.dataset.look === String(n)) {
+   return;
+ }
+  prevBtn?.classList.toggle('disabled', n === 1);
+  nextBtn?.classList.toggle('disabled', n === maxLook);
+
+
+ if (lookText){
+   lookText.classList.remove('text-snap-in','text-snap-out');   lookText.textContent = `Look ${n}/${maxLook}`;
+ }
+
+  const info = lookInfo[n] || {};
+  const isEmpty = (v) => {
+    if (v === undefined || v === null) return true;
+    const s = String(v).replace(/<br\s*\/?>/gi, ' ').trim();
+    return s === '' || s === '-' || /^null$/i.test(s) || /^none$/i.test(s) || /^없음$/i.test(s);
+  };
+  const rows = [];
+  if (!isEmpty(info.outer))  rows.push(`<p><span>아우터</span><br />${info.outer}</p>`);
+  if (!isEmpty(info.top))    rows.push(`<p><span>탑</span><br />${info.top}</p>`);
+  if (!isEmpty(info.bottom)) rows.push(`<p><span>바텀</span><br />${info.bottom}</p>`);
+  const html = rows.join('\n') || '';
+
+if (rightPanel){
+  rightPanel.dataset.look = String(n);
+
+  const nextHTML = html || '';
+  const isSame   = (rightPanel.innerHTML || '').trim() === nextHTML.trim();
+
+  if (!isSame) {
+    animateSwap(rightPanel, nextHTML).then(() => {
+      centerCreditToHero?.();
+      requestAnimationFrame(() => centerCreditToHero?.());
+    });
+  } else {
+    centerCreditToHero?.();
+    requestAnimationFrame(() => centerCreditToHero?.());
+  }
+}
+}
+
+let lookCommitTimer = null;
+let queuedLook = 1;
+let committedLook   = 1; 
+let lookCommitToken = 0;
+
+async function commitLookImage(nowToken){
+  if (nowToken !== lookCommitToken) return;
+
+  const tgt = queuedLook;
+
+  if (tgt === committedLook) return;
+
+  const nextSrc = `images/look${tgt}.jpg`;
+  await swapLookImage(nextSrc);
+  if (nowToken !== lookCommitToken) return;
+
+  committedLook = tgt;
+  renderLookMeta(tgt);
+  const n1 = Math.min(maxLook, tgt + 1);
+  const p1 = Math.max(1,       tgt - 1);
+  preloadAndDecode(`images/look${n1}.jpg`);
+  preloadAndDecode(`images/look${p1}.jpg`);
+}
+
+function scheduleLookCommit(target = currentLook){
+  queuedLook = Math.min(maxLook, Math.max(1, Number(target) || 1));
+
+  lookCommitToken++;
+  const myToken = lookCommitToken;
+
+  clearTimeout(lookCommitTimer);
+  lookCommitTimer = setTimeout(() => {
+    if (window.requestIdleCallback) {
+      requestIdleCallback(() => commitLookImage(myToken), { timeout: 120 });
+    } else {
+      commitLookImage(myToken);
+    }
+  }, COMMIT_DELAY);
+}
+
+prevBtn?.addEventListener('click', guardBusy(() => {
+  if (window.isLookTransitioning) return;
+  if (typeof withinLookCooldown === 'function' && withinLookCooldown()) return;
+
+  if (currentLook > 1) {
+    currentLook -= 1;
+    renderLookMeta(currentLook);
+    scheduleLookCommit(currentLook);
+    if (typeof startLookCooldown === 'function') startLookCooldown();
+  }
+}));
+
+nextBtn?.addEventListener('click', guardBusy(() => {
+  if (window.isLookTransitioning) return;
+  if (typeof withinLookCooldown === 'function' && withinLookCooldown()) return;
+
+  if (currentLook < maxLook) {
+    currentLook += 1;
+    renderLookMeta(currentLook);
+    scheduleLookCommit(currentLook);
+    if (typeof startLookCooldown === 'function') startLookCooldown();
+  }
+}));
+
+function isLookActive(){
+  const sec = document.getElementById('look');
+  return !!(sec && !sec.hidden);
+}
+function shouldIgnoreKey(e){
+  const el = e.target;
+  const t  = el && el.tagName;
+  return (el && (el.isContentEditable ||
+          t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT'));
+}
+
+document.addEventListener('keydown', guardBusy((e) => {
+  if (!isLookActive() || shouldIgnoreKey(e)) return;
+
+  if (e.repeat) return;
+
+  const k = e.key;
+  const goLeft  = (k === 'ArrowLeft' || k === 'a' || k === 'A');
+  const goRight = (k === 'ArrowRight' || k === 'd' || k === 'D');
+  if (!goLeft && !goRight) return;
+
+  e.preventDefault();
+
+  if (window.isLookTransitioning) return;
+  if (typeof withinLookCooldown === 'function' && withinLookCooldown()) return;
+
+  if (goLeft)  document.getElementById('prev')?.click();
+  if (goRight) document.getElementById('next')?.click();
+
+  if (typeof startLookCooldown === 'function') startLookCooldown();
+}));
+
+async function flushLookCommit(){
+  lookCommitToken++;
+  clearTimeout(lookCommitTimer);
+  await commitLookImage(lookCommitToken); // 최신 세대로 강제 실행
+}
+
+async function primeLookEntry(n){
+  const tgt = Math.min(maxLook, Math.max(1, Number(n) || 1));
+  currentLook = tgt;
+
+  lookCommitToken++;
+  clearTimeout(lookCommitTimer);
+  lookSwapToken++;
+
+  const src = `images/look${tgt}.jpg`;
+
+  try {
+    const pre = new Image(); pre.src = src;
+    if (pre.decode) await pre.decode();
+  } catch {}
+
+  imgA.src = src;
+  imgB.src = src;
+
+  imgA.style.visibility = 'visible';
+  imgA.style.opacity = '1';
+  imgA.classList.add('is-visible');
+
+  imgB.style.visibility = 'hidden';
+  imgB.style.opacity = '0';
+  imgB.classList.remove('is-visible');
+
+  onA = true;
+  committedLook = tgt;
+
+  prevBtn.classList.toggle('disabled', tgt === 1);
+  nextBtn.classList.toggle('disabled', tgt === maxLook);
+  lookText.textContent = `Look ${tgt}/${maxLook}`;
+
+  const info = lookInfo[tgt] || {};
+  const isEmpty = (v) => {
+    if (v === undefined || v === null) return true;
+    const s = String(v).replace(/<br\s*\/?>/gi, ' ').trim();
+    return s === '' || s === '-' || /^null$/i.test(s) || /^none$/i.test(s) || /^없음$/i.test(s);
+  };
+  const rows = [];
+  if (!isEmpty(info.outer))  rows.push(`<p><span>아우터</span><br />${info.outer}</p>`);
+  if (!isEmpty(info.top))    rows.push(`<p><span>탑</span><br />${info.top}</p>`);
+  if (!isEmpty(info.bottom)) rows.push(`<p><span>바텀</span><br />${info.bottom}</p>`);
+  rightPanel.innerHTML = rows.join('\n') || '';
+
+  centerCreditToHero?.();
+ const credit = document.getElementById('credit');
+ if (credit) credit.style.visibility = 'hidden';
+}
+
+const _preloaded = new Set();
+async function preload(src){
+  if (_preloaded.has(src)) return src;
+  _preloaded.add(src);
+  const img = new Image();
+  img.src = src;
+  try { if (img.decode) await img.decode(); } catch(e){}
+  return src;
+}
+
+function applySizes(el){
+  el.sizes = "(max-width: 780px) 80vw, 50vw";
+}
+
+function lockStackSize(lock){
+  const stack = document.getElementById('lookStack');
+  const vis   = stack?.querySelector('.look-img.is-visible');
+  if (!stack || !vis) return;
+  if (lock){
+    const h = vis.getBoundingClientRect().height || vis.naturalHeight || 0;
+    stack.style.minHeight = (h ? Math.round(h) : 0) + 'px';
+  } else {
+    stack.style.minHeight = '';
+  }
+}
+
+function freezeLookVisuals(){
+  try{
+    lookSwapToken++;
+    const blackout = document.getElementById('lookBlackout');
+
+    const vis = document.querySelector('#look .look-img.is-visible') || (onA ? imgA : imgB);
+    const hid = vis === imgA ? imgB : imgA;
+
+    [imgA, imgB].forEach(el => {
+      el.getAnimations?.().forEach(a => a.cancel());
+      el.style.transition = 'none';
+      el.style.visibility = 'hidden';
+      el.style.opacity    = '0';
+      el.classList.remove('is-visible');
+    });
+
+    if (vis){
+      vis.style.visibility = 'visible';
+      vis.style.opacity    = '1';
+      vis.classList.add('is-visible');
+    }
+
+    if (blackout){
+      blackout.getAnimations?.().forEach(a => a.cancel());
+      blackout.style.transition = 'none';
+      blackout.style.opacity    = '0';
+    }
+
+    lockStackSize(true);
+  } catch {}
+}
+
+let _lookSwapBusy  = false;
+let _lookSwapQueue = null;
+
+async function swapLookImage(nextSrc){
+  // 요청을 항상 최신으로 덮어써서(코얼레스) 마지막 의도만 반영
+  _lookSwapQueue = nextSrc;
+
+  // 이미 실행 중이면 이번 호출은 '끝날 때까지' 기다렸다가 리턴
+  if (_lookSwapBusy) {
+    return new Promise((resolve) => {
+      const tick = () => {
+        if (!_lookSwapBusy && _lookSwapQueue === null) resolve();
+        else setTimeout(tick, 12);
+      };
+      tick();
+    });
+  }
+
+  _lookSwapBusy = true;
+
+  try {
+    while (_lookSwapQueue) {
+      const srcToShow = _lookSwapQueue;
+      _lookSwapQueue = null; // 소모
+
+      const blackout = document.getElementById('lookBlackout');
+      const show = onA ? imgB : imgA;
+      const hide = onA ? imgA : imgB;
+
+      // 외부 호환을 위해 유지
+      window.isLookTransitioning = true;
+
+      // 애니메이션 초기 상태 정리
+      [imgA, imgB].forEach(el => {
+        try { el.getAnimations?.().forEach(a => a.cancel()); } catch(e){}
+        el.style.transition = 'none';
+        el.style.opacity = '0';
+        el.classList.remove('is-visible');
+        el.style.visibility = 'hidden';
+      });
+      blackout.style.transition = 'none';
+      blackout.style.opacity = '1';
+
+      // 다음 프레임 두 번 대기
+      await new Promise(r => requestAnimationFrame(()=>requestAnimationFrame(r)));
+
+      // 다음 이미지 프리로드
+      await preload(srcToShow);
+
+      // 실제 소스 교체
+      show.src = srcToShow;
+      applySizes(show);
+
+      // 타이밍/이징 변수
+      const rs     = getComputedStyle(document.documentElement);
+      const gapMs  = parseFloat(rs.getPropertyValue('--look-gap'))     || 140;
+      const fadeMs = parseFloat(rs.getPropertyValue('--look-fade-in')) || 520;
+      const ease   = rs.getPropertyValue('--look-ease')?.trim() || 'cubic-bezier(.22,.61,.36,1)';
+
+      // 가터(블랙아웃) 살짝 대기 후 페이드
+      await new Promise(r => setTimeout(r, gapMs));
+
+      blackout.style.transition = `opacity ${gapMs}ms ${ease}`;
+      show.style.transition     = `opacity ${fadeMs}ms ${ease}`;
+
+      show.style.visibility = 'visible';
+      show.style.opacity    = '1';
+      show.classList.add('is-visible');
+      blackout.style.opacity = '0';
+
+      await new Promise(r => setTimeout(r, fadeMs + 24));
+
+      hide.style.visibility = 'hidden';
+      hide.style.opacity    = '0';
+      hide.classList.remove('is-visible');
+
+      show.style.transition = '';
+      hide.style.transition = '';
+      blackout.style.transition = '';
+      blackout.style.opacity = '0';
+
+      onA = !onA;
+      requestAnimationFrame(() => lockStackSize(false));
+    }
+  } finally {
+    window.isLookTransitioning = false;
+    _lookSwapBusy  = false;
+  }
+}
+
+      const viewAll = document.getElementById('view-all');
+
+document.getElementById('detail-cta')?.addEventListener('click',
+  guardBusy(()=> openList(currentLook))
+);
+
+function getLookCooldown(){
+  const rs   = getComputedStyle(document.documentElement);
+  const gap  = parseFloat(rs.getPropertyValue('--look-gap'))    || 140; // ms
+  const fade = parseFloat(rs.getPropertyValue('--look-fade-in'))|| 520; // ms
+  return Math.ceil(gap + fade + 120);
+}
+let lastLookTick = 0;
+function withinLookCooldown(){
+  return (performance.now() - lastLookTick) < getLookCooldown();
+}
+function startLookCooldown(){
+  lastLookTick = performance.now();
+}
+
+function animateSwap(el, nextHTML){
+  return new Promise((resolve)=>{
+
+    el.classList.remove('text-snap-in');
+    el.classList.add('text-snap-out');
+
+    const done = () => {
+      el.removeEventListener('animationend', done);
+
+      el.innerHTML = nextHTML;
+
+      void el.offsetWidth;
+      el.classList.remove('text-snap-out');
+      el.classList.add('text-snap-in');
+
+      el.addEventListener('animationend', function fin(){
+        el.removeEventListener('animationend', fin);
+        el.classList.remove('text-snap-in');
+        resolve();
+      }, { once:true });
+    };
+
+    el.addEventListener('animationend', done, { once:true });
+
+    setTimeout(()=>{ if (el.classList.contains('text-snap-out')) { done(); } }, 180);
+  });
+}
+
+function guardBusy(fn){
+  return (...args) => { if (Transition.busy) return; fn(...args); };
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  preloadAndDecode('images/story-banner.jpg');
+  preloadAndDecode('images/story-title.png');
+  preloadAndDecode('images/chevron-up.png');
+  startIntroAutoPlay();
+});
+
+ function centerCreditToHero(){
+   const hero = document.getElementById('heroText');
+   const credit = document.getElementById('credit');
+   if (!hero || !credit) return;
+
+   const lookSec = document.getElementById('look');
+   if (lookSec && lookSec.hidden) return;
+
+   const h = hero.getBoundingClientRect();
+   const c = credit.getBoundingClientRect();
+
+   const centerX = h.left + (h.width / 2);
+   const left = Math.round(centerX - (c.width / 2) + window.scrollX);
+
+   const top = Math.round(h.bottom + 12 + window.scrollY);
+
+   credit.style.position = 'absolute';
+   credit.style.left = left + 'px';
+   credit.style.top  = top  + 'px';
+ }
+
+window.addEventListener('load', centerCreditToHero);
+window.addEventListener('resize', centerCreditToHero);
+
+function prepForFadeIn(el){
+
+  el.classList.remove('fade-in','fade-out');
+  el.style.opacity = '0'; 
+  el.hidden = false;
+
+  return new Promise(resolve=>{
+    requestAnimationFrame(()=>{ requestAnimationFrame(()=>{
+      resolve();
+    }); });
+  });
+}
+
+function waitAnimEndOrTimeout(el, timeout = 900, event = 'animationend'){
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      try { el.removeEventListener(event, onEnd); } catch(_) {}
+      resolve();
+    };
+    const onEnd = () => finish();
+
+    el.addEventListener(event, onEnd, { once: true });
+    setTimeout(finish, timeout + 50);
+  });
+}
+ 
+async function safeFadeSwap(fromEl, toEl, {
+  outClass = 'fade-out',
+  inClass  = 'fade-in',
+  timeout  = 900,
+  onBeforeOut,
+  onAfterOut,
+  onAfterIn
+} = {}){
+  await prepForFadeIn(toEl);
+
+  [fromEl, toEl].forEach(el => {
+    if (!el) return;
+    el.classList.remove('fade-in','fade-out');
+  });
+
+  if (typeof onBeforeOut === 'function') onBeforeOut();
+
+  // OUT
+  if (fromEl) {
+    fromEl.classList.add(outClass);
+    await waitAnimEndOrTimeout(fromEl, timeout);
+    fromEl.classList.remove(outClass);
+    fromEl.hidden = true;
+  }
+
+  if (typeof onAfterOut === 'function') onAfterOut();
+
+  // IN
+  toEl.hidden = false;
+  toEl.classList.add(inClass);
+
+  await waitAnimEndOrTimeout(toEl, timeout);
+
+  toEl.classList.remove(inClass);
+  toEl.style.opacity = '';
+  toEl.style.zIndex  = '';
+  toEl.style.pointerEvents = '';
+
+  if (typeof onAfterIn === 'function') onAfterIn();
+}
+
+function backToGallery(){
+  const token = Transition.start('gallery');
+  window.isCustomTransition = true;
+
+  const gallerySec = document.getElementById('gallery');
+  const lookSec    = document.getElementById('look');
+
+  pushSection('gallery', { silent:true });
+
+  applyGlobalUIFor('gallery');
+
+  prepForFadeIn(gallerySec).then(()=>{
+    lookSec.classList.add('fade-out');
+    lookSec.addEventListener('animationend', function onOut(){
+      lookSec.removeEventListener('animationend', onOut);
+      lookSec.classList.remove('fade-out');
+      lookSec.hidden = true;
+
+      gallerySec.classList.add('fade-in');
+      gallerySec.addEventListener('animationend', function onIn(){
+        gallerySec.removeEventListener('animationend', onIn);
+        gallerySec.classList.remove('fade-in');
+        gallerySec.style.opacity = '';
+
+        if (Transition.isCurrent(token)) {
+          applyGlobalUIFor('gallery');
+          window.isCustomTransition = false;
+          Transition.end(token);
+        }
+      }, { once:true });
+    }, { once:true });
+  });
+}
+
+document.getElementById('view-all')?.addEventListener('click', (e)=>{
+  e.preventDefault();
+  backToGallery();
+});
+
+const listSec      = document.getElementById('list');
+const listViewport = document.getElementById('listViewport');
+const listBackBtn  = document.getElementById('listBack');
+const listDotsWrap = document.getElementById('listDots');
+listBackBtn?.addEventListener('click', guardBusy(backToLookFromList));
+
+let listCurrentLook = 1; 
+let listCurrentCat  = 'outer';
+
+const selectedVariantByLookCat = new Map();
+const vk = (look, cat) => `${look}::${cat}`;
+
+let fadeIndex = 0;
+let fadeBusy  = false;
+let fadeImgs  = []; 
+
+function renderListDots(count){
+  if (!listDotsWrap) return;
+  listDotsWrap.innerHTML = '';
+  for (let i = 0; i < count; i++){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'dot' + (i === 0 ? ' active' : '');
+    b.setAttribute('aria-label', `이미지 ${i+1}`);
+    b.addEventListener('click', () => fadeTo(i));
+    listDotsWrap.appendChild(b);
+  }
+}
+
+function updateListDotsActive(idx){
+  if (!listDotsWrap) return;
+  const dots = listDotsWrap.querySelectorAll('.dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+function renderListSlides(meta){
+  listViewport.innerHTML = '';
+
+  const stack = document.createElement('div');
+  stack.className = 'fade-stack';
+
+  const imgs = meta.images;
+
+  fadeImgs = imgs.map((src, i) => {
+    const img = document.createElement('img');
+    img.className = 'fade-img';
+    if (i === 0) {
+      img.loading = 'eager';
+      img.src = src;
+      tryCloudinary(img);
+    } else {
+      setImgSrcLazy(img, src);
+    }
+    img.alt = `${meta.name || 'Look'} ${i+1}`;
+    stack.appendChild(img);
+    return img;
+  });
+
+  listViewport.appendChild(stack);
+
+stack.querySelectorAll('img[data-src]').forEach((img) => {
+  commitSrcWithCloudinary(img);
+});
+
+  requestAnimationFrame(() => {
+    if (fadeImgs[0]) fadeImgs[0].classList.add('is-active');
+  });
+
+  fadeIndex = 0;
+  renderListDots(fadeImgs.length);
+}
+
+async function fadeTo(next){
+  if (fadeBusy || next === fadeIndex) return;
+  const cur = fadeImgs[fadeIndex];
+  const nxt = fadeImgs[next];
+  if (!nxt) return;
+
+  fadeBusy = true;
+
+  await ensureDecoded(nxt, 320);
+
+  cur?.classList.remove('is-active');
+  nxt.classList.add('is-active');
+
+  updateListDotsActive(next);
+
+  setTimeout(() => { fadeBusy = false; }, 360);
+  fadeIndex = next;
+}
+
+function moveFade(step){
+  const count = fadeImgs.length || 0;
+  if (!count) return;
+  const dir = step > 0 ? 1 : -1;
+  const next = (fadeIndex + dir + count) % count;
+  fadeTo(next);
+}
+
+(function bindListInput(){
+  // wheel
+  listViewport.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const dy = e.deltaY || 0;
+    if (Math.abs(dy) < 5) return;
+    moveFade(dy > 0 ? +1 : -1);
+  }, { passive:false });
+
+  // touch
+  let sy = null;
+  listViewport.addEventListener('touchstart', (e) => {
+    sy = e.touches?.[0]?.clientY ?? null;
+  }, { passive:true });
+
+  listViewport.addEventListener('touchmove', (e) => {
+    if (sy == null) return;
+    const y  = e.touches?.[0]?.clientY ?? sy;
+    const dy = y - sy;
+    if (Math.abs(dy) > 24) {
+      e.preventDefault();
+      e.stopPropagation();
+      moveFade(dy < 0 ? +1 : -1);
+      sy = y;
+    }
+  }, { passive:false });
+
+  listViewport.addEventListener('touchend', () => { sy = null; }, { passive:true });
+})();
+
+const ITEM_LABEL = { outer: '아우터', top: '탑', bottom: '바텀' };
+const ITEM_ORDER = ['outer','top','bottom'];
+
+function renderItemNav(n) {
+  const nav = document.getElementById('listItemNav');
+  if (!nav) return [];
+
+  const catalog = listCatalog[n] || {};
+  const cats = ITEM_ORDER.filter(k => !!catalog[k]);
+
+  nav.innerHTML = cats.map(k =>
+    `<button type="button" data-cat="${k}">${ITEM_LABEL[k]}</button>`
+  ).join('');
+
+  return cats;
+}
+
+function renderListInfo(n, cat = listCurrentCat){
+  const catalog = listCatalog[n] || {};
+  const availableCats = renderItemNav(n); // ['outer','bottom'] 등
+
+  if (!availableCats.includes(cat)) {
+    cat = availableCats[0] || '';
+    listCurrentCat = cat;
+  }
+
+  const entry = catalog?.[cat] || null;
+
+  const nav = document.getElementById('listItemNav');
+  if (nav){
+    nav.querySelectorAll('button[data-cat]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.cat === cat);
+    });
+  }
+  if (!entry){
+    document.getElementById('listLookNo').textContent    = `Look #${n}`;
+    document.getElementById('listName').textContent      = '';
+    document.getElementById('listColorName').textContent = '';
+    document.getElementById('listSpec').textContent      = '';
+    listViewport.innerHTML = '';
+    listDotsWrap && (listDotsWrap.innerHTML = '');
+    return;
+  }
+
+  const order  = entry.order || Object.keys(entry.variants || {});
+  const key0   = entry.defaultKey || order[0];
+  const vKey   = selectedVariantByLookCat.get(vk(n, cat)) || key0;
+  const curVar = entry.variants[vKey];
+
+  document.getElementById('listLookNo').textContent    = `Look #${n}`;
+  document.getElementById('listName').textContent      = entry.name || '';
+document.getElementById('listColorName').textContent = curVar?.label || '';
+
+const rawSpec   = (curVar && curVar.spec)  || entry.spec  || '';
+const rawSpec2  = (curVar && curVar.spec2) || entry.spec2 || '';
+
+const specText  = rawSpec.replace(/^\s+|\s+$/g, '').replace(/\n{3,}/g, '\n\n');
+const spec2Text = rawSpec2.replace(/^\s+|\s+$/g, '').replace(/\n{3,}/g, '\n\n');
+
+const specEl   = document.getElementById('listSpec');
+const spec2El  = document.getElementById('listSpec2');
+const wrapEl   = document.getElementById('listSpecWrap');
+
+specEl.textContent = specText;
+
+const isLook10Outer = (n === 10 && cat === 'outer');
+if (isLook10Outer && spec2Text && spec2Text.trim() !== '') {
+  spec2El.textContent = spec2Text;
+  spec2El.hidden = false;
+  if (wrapEl) wrapEl.style.display = '';
+} else {
+  spec2El.textContent = '';
+  spec2El.hidden = true;
+}
+
+  const chips = document.getElementById('listChips');
+  chips.innerHTML = '';
+  order.forEach(key => {
+    const v = entry.variants[key];
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (key === vKey ? ' active' : '');
+    b.style.setProperty('--chip', v.chip || '#ccc');
+    b.dataset.key = key;
+    b.title = v.label;
+    chips.appendChild(b);
+  });
+
+  renderListSlides({ name: entry.name, images: curVar.images });
+}
+
+document.getElementById('listChips').addEventListener('click', (e) => {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+
+  const key  = btn.dataset.key;
+  const entry = listCatalog[listCurrentLook]?.[listCurrentCat];
+  if (!entry?.variants[key]) return;
+
+  selectedVariantByLookCat.set(vk(listCurrentLook, listCurrentCat), key);
+
+const vObj = entry.variants[key];
+document.getElementById('listColorName').textContent = vObj.label || '';
+
+const specEl   = document.getElementById('listSpec');
+const spec2El  = document.getElementById('listSpec2');
+const wrapEl   = document.getElementById('listSpecWrap');
+
+const s1raw = (vObj.spec)  || entry.spec  || '';
+specEl.textContent = s1raw.replace(/^\s+|\s+$/g, '').replace(/\n{3,}/g, '\n\n');
+
+const isLook10Outer = (listCurrentLook === 10 && listCurrentCat === 'outer');
+const s2raw = (vObj.spec2) || entry.spec2 || '';
+const s2    = s2raw.replace(/^\s+|\s+$/g, '').replace(/\n{3,}/g, '\n\n');
+
+if (isLook10Outer && s2 && s2.trim() !== '') {
+  spec2El.textContent = s2;
+  spec2El.hidden = false;
+  if (wrapEl) wrapEl.style.display = '';
+} else {
+  spec2El.textContent = '';
+  spec2El.hidden = true;
+}
+  document.querySelectorAll('#list .chip').forEach(c =>
+    c.classList.toggle('active', c.dataset.key === key)
+  );
+  renderListSlides({ name: entry.name, images: entry.variants[key].images });
+});
+
+
+async function openList(n, cat = 'outer'){
+  const token = Transition.start('list');
+  window.isCustomTransition = true;
+
+  try {
+    const blackout = document.getElementById('lookBlackout');
+    if (blackout) {
+      blackout.getAnimations?.().forEach(a => a.cancel());
+      blackout.style.transition = 'none';
+      blackout.style.opacity = '0';
+    }
+    const lookSec = document.getElementById('look');
+    const listSec = document.getElementById('list');
+    [lookSec, listSec].forEach(sec => {
+      if (!sec) return;
+      sec.classList.remove('fade-in','fade-out');
+      sec.style.opacity = '';
+      sec.style.zIndex = '';
+      sec.style.pointerEvents = '';
+    });
+
+    applyGlobalUIFor('list');
+
+    listCurrentLook = Math.min(11, Math.max(1, Number(n) || 1));
+    listCurrentCat  = cat;
+    renderListInfo(listCurrentLook, listCurrentCat);
+
+    pushSection('list', { silent: true });
+
+    await safeFadeSwap(
+      document.getElementById('look'),
+      document.getElementById('list'),
+      { timeout: 900 }
+    );
+
+    if (!Transition.isCurrent(token)) return;
+
+    applyGlobalUIFor('list');
+  } finally {
+    window.isCustomTransition = false;
+    Transition.end(token);
+  }
+}
+
+function backToLookFromList(){
+  const token = Transition.start('look');
+  window.isCustomTransition = true;
+
+  const listSec = document.getElementById('list');
+  const lookSec = document.getElementById('look');
+
+  applyGlobalUIFor('look');
+
+  prepForFadeIn(lookSec).then(() => {
+    [lookSec, listSec].forEach(sec => {
+      sec.classList.remove('fade-in','fade-out');
+      sec.style.opacity = '';
+      sec.style.zIndex = '';
+      sec.style.pointerEvents = '';
+    });
+
+    lookSec.classList.add('fade-in');
+    listSec.classList.add('fade-out');
+
+    const finish = () => {
+      if (!Transition.isCurrent(token)) return;
+
+      listSec.classList.remove('fade-out');
+      listSec.hidden = true;
+
+      lookSec.classList.remove('fade-in');
+      lookSec.style.opacity = '';
+      lookSec.style.pointerEvents = '';
+      lookSec.style.zIndex = '';
+
+      applyGlobalUIFor('look');
+
+      window.isCustomTransition = false;
+      Transition.end(token);
+    };
+
+    lookSec.addEventListener('animationend', finish, { once: true });
+    setTimeout(finish, 900);
+  });
+}
+document.getElementById('listItemNav')?.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-cat]');
+  if (!btn) return;
+  const cat = btn.dataset.cat;
+  listCurrentCat = cat;
+  renderListInfo(listCurrentLook, listCurrentCat);
+});
+
+function updateScrollComp() {
+  const root = document.documentElement;
+
+  const hasScroll = root.scrollHeight > root.clientHeight;
+
+  const sbw = Math.max(0, window.innerWidth - root.clientWidth);
+
+  root.style.setProperty('--sb-comp', hasScroll ? (sbw / 2) + 'px' : '0px');
+}
+
+window.addEventListener('load', updateScrollComp);
+window.addEventListener('resize', updateScrollComp);
+document.addEventListener('DOMContentLoaded', updateScrollComp);
+
+(function patchNavStabilityHooks(){
+ if (window.__navStabilityHooked) return;
+ window.__navStabilityHooked = 1;
+  const _show = window.show;
+  if (typeof _show === 'function') {
+    window.show = function(id){
+      const r = _show.apply(this, arguments);
+      requestAnimationFrame(updateScrollComp);
+      return r;
+    };
+  }
+  ['backToGallery','openList','backToLookFromList'].forEach(fn=>{
+    if (typeof window[fn] === 'function') {
+      const orig = window[fn];
+      window[fn] = function(){
+        const res = orig.apply(this, arguments);
+        requestAnimationFrame(()=>requestAnimationFrame(updateScrollComp));
+        return res;
+      };
+    }
+  });
+})();
+
+(function bindContextAndDragGuards(){
+  const isEditable = (el) => {
+    if (!el) return false;
+    const tag = el.tagName;
+    return (
+      el.isContentEditable ||
+      tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
+    );
+  };
+
+  document.addEventListener('contextmenu', (e) => {
+    if (isEditable(e.target)) return;
+    e.preventDefault();
+  }, { capture: true });
+
+  document.addEventListener('dragstart', (e) => {
+    if (isEditable(e.target)) return;
+    e.preventDefault();
+  }, { capture: true });
+})();
+
+document.getElementById('gallerySeeAll')?.addEventListener('click', async () => {
+  window.isCustomTransition = true;
+
+  const gallerySec = document.getElementById('gallery');
+  const lookSec    = document.getElementById('look');
+
+  pushSection('look', { silent:true });
+  await primeLookEntry(1);
+
+  gallerySec.classList.remove('fade-in','fade-out');
+  lookSec.classList.remove('fade-in','fade-out');
+
+  gallerySec.classList.add('fade-out');
+  gallerySec.addEventListener('animationend', function onFadeOut(){
+    gallerySec.removeEventListener('animationend', onFadeOut);
+    gallerySec.classList.remove('fade-out');
+    gallerySec.hidden = true;
+
+    lookSec.hidden = false;
+    lookSec.classList.add('fade-in');
+    lookSec.addEventListener('animationend', function onFadeIn(){
+      lookSec.removeEventListener('animationend', onFadeIn);
+      lookSec.classList.remove('fade-in');
+    applyGlobalUIFor('look');
+    window.isCustomTransition = false;
+  }, { once:true });
+  }, { once:true });
+});
+
+function playStoryEnterAnim(){
+  const story = document.getElementById('story');
+  if (!story) return;
+
+  story.classList.remove('play');
+  story.classList.add('story-anim');
+
+  requestAnimationFrame(()=> {
+    requestAnimationFrame(()=> {
+      story.classList.add('play');
+    });
+  });
+
+  const cleanup = () => {
+    story.classList.remove('story-anim', 'play');
+    story.removeEventListener('animationend', cleanup, { capture:false });
+  };
+  story.addEventListener('animationend', cleanup, { once:true });
+}
+
+  </script>
+</body>
+</html>
