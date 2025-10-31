@@ -1784,7 +1784,7 @@ img, svg {
     <!-- 사진 배너 -->
 <figure class="story-banner">
 <img
-  src="images/story-banner.jpg"
+src="https://res.cloudinary.com/daizpzcxl/image/upload/f_auto,q_auto,dpr_auto,c_limit,w_2000/story-banner.jpg"
   alt="Les Ouvriers 컬렉션 배너"
   loading="eager" fetchpriority="high" decoding="async"
   width="1600" height="900">
@@ -2023,11 +2023,11 @@ function migrateImagesPath(url){
   return url.replace(/^(?:\.\/)?images\/(?:products|ui|list)\//, 'images/');
 }
 
-function toCloudinaryPathWithWidth(localSrc, w = 800){
+function toCloudinaryPathWithWidth(localSrc, w = 800, quality = 'auto'){
   localSrc = migrateImagesPath(localSrc);
   const trimmed = localSrc.replace(/^\.?\//,'');
   if (!trimmed.startsWith('images/')) return null;
-  const opts = `f_auto,q_auto,dpr_auto,c_limit,w_${w}`;
+  const opts = `f_auto,q_${quality},dpr_auto,c_limit,w_${w}`;
   const _folderSeg = CLD_FOLDER ? '/' + CLD_FOLDER.replace(/^\/|\/$/g, '') : '';
   return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${opts}${_folderSeg}/`
          + trimmed.replace(/^images\//,'');
@@ -3042,7 +3042,7 @@ thumb.dataset.look = i;
 base.src   = `images/look${i}-thumb.jpg`;
 base.sizes = '(max-width:780px) 50vw, (max-width:1200px) 33vw, 25vw';
 base.srcset = [400, 800, 1200, 1600]
-  .map(w => `${toCloudinaryPathWithWidth(`images/look${i}-thumb.jpg`, w)} ${w}w`)
+  .map(w => `${toCloudinaryPathWithWidth(`images/look${i}-thumb.jpg`, w, 'auto:eco')} ${w}w`)
   .join(', ');
 
 tryCloudinary(base);
@@ -5099,6 +5099,12 @@ async function primeLookEntry(n){
   tryCloudinary(imgA);
   tryCloudinary(imgB);
 
+const __w = [800, 1200, 1600, 2000];
+[imgA, imgB].forEach(el => {
+  el.srcset = __w.map(w => `${toCloudinaryPathWithWidth(src, w)} ${w}w`).join(', ');
+  el.sizes  = '(max-width: 1200px) 80vw, 40vw';
+});
+
   imgA.style.visibility = 'visible';
   imgA.style.opacity = '1';
   imgA.classList.add('is-visible');
@@ -5240,6 +5246,9 @@ async function swapLookImage(nextSrc){
 
       // 실제 소스 교체
       show.src = srcToShow;
+const __widths = [800, 1200, 1600, 2000];
+show.srcset = __widths.map(w => `${toCloudinaryPathWithWidth(srcToShow, w)} ${w}w`).join(', ');
+show.sizes  = '(max-width: 1200px) 80vw, 40vw';
       applySizes(show);
       tryCloudinary(show);
 
