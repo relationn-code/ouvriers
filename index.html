@@ -708,16 +708,23 @@ transform: translate(-3px,10px);
 }
 .story-banner{
   width: 100vw;
-  height: calc(100dvh - var(--story-top-block));
+  aspect-ratio: 16 / 9;
+  max-height: calc(100dvh - var(--story-top-block));
   margin-top: var(--story-top-block);
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
+  display: grid;
+  place-items: center;
+  overflow: clip;
+  background: #fff;
   overflow: hidden;
 }
 .story-banner img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover; 
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   object-position: center;
   display: block;
   will-change: transform, opacity;
@@ -833,8 +840,8 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
 
 @media (max-width: 1024px){
   :root{
-    --logo-w-min: 110px;    /* 로고 너무 커지지 않게 최소값 살짝 ↓ */
-    --nav-font-min: 13.5px; /* 폰트 최소값 살짝 ↓ */
+    --logo-w-min: 110px;
+    --nav-font-min: 13.5px;
   }
 }
 @media (max-width: 1400px){
