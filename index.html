@@ -737,10 +737,8 @@ transform: translate(-3px,10px);
 /*INTRO/PRODUCTS/GALLERY 로고 & 네비 위치 */
 :root{
   --logo-w: 180px;
-  --logo-top: 50px;
-  --logo-left: 58px;
-  --nav-pad: 18px 28px 6px;
-  --nav-maxw: 1200px;
+  --logo-top:  clamp(24px, 3.5vw, 60px);
+  --logo-left: clamp(20px, 4.0vw, 84px);
   --story-top-block: 5px;
   --intro-arrow-opacity: .85;
   --intro-arrow-opacity-hover: 1;
@@ -759,7 +757,7 @@ transform: translate(-3px,10px);
   position: absolute;
   top: 18px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(calc(-50% + var(--sb-comp, 0px)));
   width: 100%;
   max-width: var(--nav-maxw);
   padding: var(--nav-pad);
@@ -773,8 +771,10 @@ transform: translate(-3px,10px);
   overflow: visible;
 }
 :root{
-  --nav-maxw: 1200px;
-  --nav-pad: 18px 28px 6px;
+  --nav-maxw:  min(1200px, 92vw);
+  --nav-pad:   clamp(10px, 1.2vw, 18px) clamp(16px, 2.2vw, 28px) clamp(2px, .8vw, 6px);
+  --nav-gap:   clamp(28px, 8vw, 130px);
+  --sb-comp: 0px;
   --logo-w: 180px;
   --logo-top: 50px;
   --logo-left: 58px;
@@ -789,12 +789,11 @@ transform: translate(-3px,10px);
   z-index: 9998;
   pointer-events: none;
 }
-/* 전역 고정 네비 */
 .site-nav{
   position: fixed;
   top: 10px;
-  left: calc(50% + var(--sb-comp, 0px));
-  transform: translateX(-57%);
+  left: 50%;
+transform: translateX(calc(-57% + var(--sb-comp, 0px)));
   width: 100%;
   max-width: var(--nav-maxw);
   padding: var(--nav-pad);
@@ -805,7 +804,7 @@ transform: translate(-3px,10px);
 .site-nav ul{
   list-style: none;
   display: flex;
-  gap: 130px;
+  gap: var(--nav-gap);
   justify-content: center;
   align-items: center;
   font-size: 1.05rem;
