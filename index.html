@@ -739,6 +739,13 @@ transform: translate(-3px,10px);
   --logo-w: 180px;
   --logo-top:  clamp(24px, 3.5vw, 60px);
   --logo-left: clamp(20px, 4.0vw, 84px);
+  --logo-safe: clamp(8px, 2vw, 28px);
+  --logo-w-min: 120px;
+  --logo-w-max: 240px;
+  --logo-w: clamp(var(--logo-w-min), 12vw, var(--logo-w-max));
+  --nav-font-min: 14px;
+  --nav-font-max: 20px;
+  --nav-font: clamp(var(--nav-font-min), 1.05vw, var(--nav-font-max));
   --story-top-block: 5px;
   --intro-arrow-opacity: .85;
   --intro-arrow-opacity-hover: 1;
@@ -750,7 +757,6 @@ transform: translate(-3px,10px);
   --page-bottom: 250px;
 }
 
-/* 상단 네비 */
 #intro .intro-nav,
 #products .intro-nav,
 #gallery .intro-nav{
@@ -807,13 +813,15 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
   gap: var(--nav-gap);
   justify-content: center;
   align-items: center;
-  font-size: 1.05rem;
   margin: 0;
   padding: 0;
 }
 .site-nav a{
-  color: #000; 
-  text-decoration: none;
+  text-decoration:none;
+  color:#000;
+  font-size: var(--nav-font);
+  line-height: 1.15;
+  letter-spacing: .2px;
 }
 .site-nav a:hover{ text-decoration: underline; }
 
@@ -821,6 +829,23 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
 .right-panel{
   max-width: 360px; 
   bottom: clamp(40px, 12vh, 18vh);
+}
+
+@media (max-width: 1024px){
+  :root{
+    --logo-w-min: 110px;    /* 로고 너무 커지지 않게 최소값 살짝 ↓ */
+    --nav-font-min: 13.5px; /* 폰트 최소값 살짝 ↓ */
+  }
+}
+@media (max-width: 1400px){
+  .site-nav{
+    padding-left: calc(var(--logo-left) + var(--logo-w) + var(--logo-safe));
+  }
+}
+@media (max-width: 1200px){
+  .site-nav{
+    padding-left: calc(var(--logo-left) + var(--logo-w) + (var(--logo-safe) * 1.2));
+  }
 }
 
 
