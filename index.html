@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta name="viewport" content="width=1200">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
 <link rel="dns-prefetch" href="https://res.cloudinary.com">
 <link rel="preload" as="image" href="images/story-banner.jpg" fetchpriority="high">
@@ -1166,12 +1166,12 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
 
 /* STORY 헤더 최종 오버라이드 */
 :root{
-  --story-title-top:  41px;
-  --story-head-gap:   35px;
-  --story-lead-size:  18px;
+  --story-title-top:  clamp(24px, 3vw, 41px);
+  --story-head-gap:   clamp(14px, 2.8vw, 35px);
+  --story-lead-size:  clamp(14px, 1.35vw, 18px);
   --story-lead-line:  1.8;
-  --story-lead-maxw:  720px;
-  --story-back-top:   -25px;
+  --story-lead-maxw:  clamp(520px, 60vw, 920px);
+  --story-back-top:   clamp(-32px, -2.2vw, -20px);
 }
 
 #story .story-back{
