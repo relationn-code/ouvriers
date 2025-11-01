@@ -747,14 +747,6 @@ transform: translate(-3px,10px);
   --nav-font-min: 14px;
   --nav-font-max: 20px;
   --nav-font: clamp(var(--nav-font-min), 1.05vw, var(--nav-font-max));
-  --story-top-block: 5px;
-  --story-pad-x: clamp(16px,  4vw, 60px);
-  --story-pad-t: clamp(20px,  3.5vw, 48px);
-  --story-gap:   clamp(14px,  2.8vw, 35px);
---story-title-w: clamp(120px, 12vw, 240px);
-  --story-lead-size: clamp(14px, 1.35vw, 18px);
-  --story-lead-line: 1.8;
-  --story-lead-maxw: clamp(520px, 60vw, 920px);
   --intro-arrow-opacity: .85;
   --intro-arrow-opacity-hover: 1;
   --ko-wght: 450;
@@ -1166,12 +1158,17 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
 
 /* STORY 헤더 최종 오버라이드 */
 :root{
-  --story-title-top:  clamp(24px, 3vw, 41px);
-  --story-head-gap:   clamp(14px, 2.8vw, 35px);
-  --story-lead-size:  clamp(14px, 1.35vw, 18px);
+  --story-title-top: clamp(16px, 3vmin, 72px);
+  --story-head-gap:  clamp(10px, 2.6vmin, 48px);
+  --story-title-w: clamp(190px, 22vmin, 520px);
+  --story-lead-size: clamp(14px, 0.6rem + 0.6vw, 18px);
   --story-lead-line:  1.8;
-  --story-lead-maxw:  clamp(520px, 60vw, 920px);
+  --story-lead-maxw: clamp(520px, 52vw, 1100px);
   --story-back-top:   clamp(-32px, -2.2vw, -20px);
+  --story-top-block: 5px;
+  --story-pad-x: clamp(16px, 4vw, 80px);
+  --story-pad-t: clamp(24px, 6vmin, 140px);
+  --story-gap:   clamp(16px, 3vmin, 48px);
 }
 
 #story .story-back{
