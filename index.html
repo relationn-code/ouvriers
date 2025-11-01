@@ -792,7 +792,7 @@ transform: translate(-3px,10px);
 /* 전역 고정 네비 */
 .site-nav{
   position: fixed;
-  top: calc(10px * var(--ui-scale));
+  top: 10px;
   left: calc(50% + var(--sb-comp, 0px));
   transform: translateX(-57%);
   width: 100%;
@@ -805,10 +805,10 @@ transform: translate(-3px,10px);
 .site-nav ul{
   list-style: none;
   display: flex;
-  gap: clamp(72px, calc(130px * var(--ui-scale)), 160px);
+  gap: 130px;
   justify-content: center;
   align-items: center;
-  font-size: var(--header-fs);
+  font-size: 1.05rem;
   margin: 0;
   padding: 0;
 }
@@ -1720,27 +1720,6 @@ img, svg {
 @keyframes storyRiseFade{
   from{ opacity:0; transform: translateY(12px); }
   to  { opacity:1; transform: translateY(0);    }
-}
-
-:root{
-  --scaleW: calc(100vw / var(--Wref));
-  --scaleH: calc(100vh / var(--Href));
-  --ui-scale-raw: min(var(--scaleW), var(--scaleH));
-
-  --ui-scale: clamp(0.80, var(--ui-scale-raw), 1.20);
-
-  --header-fs: clamp(14px, calc(16px * var(--ui-scale)), 20px);
-}
-
-:root{
-  --logo-w:   calc(180px * var(--ui-scale));
-  --logo-top: calc( 50px * var(--ui-scale));
-  --logo-left:calc( 58px * var(--ui-scale));
-
-  --nav-maxw: calc(1200px * var(--ui-scale));
-  --nav-pad:  calc(18px * var(--ui-scale))
-              calc(28px * var(--ui-scale))
-              calc( 6px * var(--ui-scale));
 }
 
   </style>
