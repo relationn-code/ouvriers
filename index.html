@@ -172,16 +172,43 @@ section[hidden] { display:none !important; pointer-events:none !important; }
       z-index: 10;
       opacity: 0.3
     }
+    .image-container {
+      position: absolute;
+      top: 50%;
+      left: 68%;
+      transform: translate(-50%, -50%);
+    }
+    .image-container img {
+      max-height: 80vh;
+      width: auto;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
     .image-container img.fade-out {
       opacity: 0;
+    }
+    .right-panel {
+      position: absolute;
+      left: calc(68% + 280px);
+      bottom: 18vh;
+      text-align: left;
+      font-size: 16px;
+      line-height: 1.7;
     }
     .right-panel span {
       font-weight: bold;
     }
+    .down-arrow {
+      position: absolute;
+      left: calc(68% + 323px);
+      bottom: 5vh;
+      font-size: 15px;
+      cursor: pointer;
+    }
 .detail-cta{
   position: absolute;
-  right: var(--rp-gap);
-  bottom: clamp(16px, 6vh, 10vh);
+  left: var(--look-panel-left, calc(68% + 280px));
+  bottom: 10.5vh;
   padding: 10px 16px;
   border: 2px solid #fff;
   background: transparent;
@@ -736,11 +763,6 @@ transform: translate(-3px,10px);
   --glide-oy: 7px;
   --page-bottom: 250px;
   --footer-logo-w: clamp(120px, 12vw, 200px);
-  --rp-w:   clamp(260px, 22vw, 360px);
-  --rp-gap: clamp(24px, 4vw, 60px);
-  --reserved-right: calc(var(--rp-w) + var(--rp-gap));
-  --cta-bottom: clamp(16px, 6vh, 10vh);
-  --cta-gap:    64px;
 }
 
 #intro .intro-nav,
@@ -812,6 +834,10 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
 .site-nav a:hover{ text-decoration: underline; }
 
 #products{ padding-top: 0 !important; }
+.right-panel{
+  max-width: 360px; 
+  bottom: clamp(40px, 12vh, 18vh);
+}
 
 @media (max-width: 1024px){
   :root{
@@ -839,74 +865,44 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
   overflow: hidden;
   background: #000;
 }
-#look .right-wrap{
-  position: absolute;
-  right: var(--rp-gap);
-  bottom: clamp(16px, 6vh, 10vh);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
-  z-index: 3;
-}
-#look .right-panel{ position: static; width: min(var(--rp-w), 32vw); max-width: var(--rp-w); }
-#look .detail-cta{ position: static; }
-#look .image-container{
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: calc(var(--rp-w) + var(--rp-gap));
-  transform: translateY(-50%);
-  height: auto;
-  max-width: none;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-  z-index: 1;
+#look .container{ position:relative; width:100%; height:100%; }
+
+#look .left-text-block{
+  position:absolute; top:50%; left:25%;
+  transform: translate(-50%, -50%);
+  text-align:center;
 }
 
+#look .image-container{
+  position:absolute; top:50%; left:68%;
+  transform: translate(-50%, -50%);
+}
 #look .look-stack{
   position: relative;
-  width: auto;
-  height: auto;
-  display: grid;
-  place-items: center;
+  width: auto; height: auto;
 }
 
-#look .image-container img,
 #look .look-img{
-  max-width: 100%;
-  max-height: 80vh;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
-}
-#look .left-text-block{
-  position: absolute;
-  top: 50%;
-  left: clamp(16%, 50% - 20vw, 34%);
+  position:absolute; top:50%; left:50%;
   transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 3;
-  pointer-events: auto;
+  width:auto; height:auto; max-height:80vh; object-fit:contain;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity var(--look-fade-in) var(--look-ease);
+  will-change: opacity;
 }
-#look .container{ position:relative; width:100%; height:100%; }
 
 #look .look-img.is-visible{
   visibility: visible;
   opacity: 1;
 }
-
-@media (max-width: 1280px){
-  #look .container{
-    position: relative;
-    display: grid;
-    grid-auto-rows: auto;
-    justify-items: center;
-    align-items: start;
-    padding: 56px 24px;
-  }
+#look .right-panel{
+  position:absolute;
+  left: var(--look-panel-left, calc(68% + 280px));
+  bottom: 18vh;
+  max-width: 360px;
+  text-align: left;
+  z-index: 2;
 }
 
 
@@ -1868,10 +1864,9 @@ src="https://res.cloudinary.com/daizpzcxl/image/upload/f_auto,q_auto,dpr_auto,c_
 <div class="look-blackout" id="lookBlackout"></div>
   </div>
 </div>
-<div class="right-wrap">
-  <div class="right-panel" id="right-panel"></div>
-  <button class="detail-cta" id="detail-cta" type="button">룩 자세히 보기</button>
-</div>
+      <div class="right-panel" id="right-panel"></div>
+      <button class="detail-cta" id="detail-cta" type="button">룩 자세히 보기</button>
+    </div>
     <div id="credit" class="credit">Illustration by J. Han</div>
   </section>
 
@@ -5142,6 +5137,7 @@ if (rightPanel){
   if (!isSame) {
     animateSwap(rightPanel, nextHTML).then(() => {
       centerCreditToHero?.();
+      layoutLookPanel();
       requestAnimationFrame(() => centerCreditToHero?.());
     });
   } else {
@@ -5314,6 +5310,7 @@ const __w = [800, 1200, 1600, 2000];
   rightPanel.innerHTML = rows.join('\n') || '';
 
   centerCreditToHero?.();
+  layoutLookPanel();
  const credit = document.getElementById('credit');
  if (credit) credit.style.visibility = 'hidden';
 }
@@ -5457,7 +5454,11 @@ await ensureDecoded(show, 360);
       show.style.transition = '';
       blackout.style.transition = '';
       onA = !onA;
-      requestAnimationFrame(() => lockStackSize(false));
+      requestAnimationFrame(() => {
+        lockStackSize(false);
+        layoutLookPanel();
+        try { centerCreditToHero(); } catch(_){}
+      });
     }
   } finally {
     window.isLookTransitioning = false;
@@ -5544,6 +5545,38 @@ document.addEventListener('DOMContentLoaded', () => {
    credit.style.left = left + 'px';
    credit.style.top  = top  + 'px';
  }
+
+function layoutLookPanel(){
+  const lookSec = document.getElementById('look');
+  if (!lookSec || lookSec.hidden) return;
+
+  const stack  = document.getElementById('lookStack');
+  const panel  = document.getElementById('right-panel');
+  const cta    = document.getElementById('detail-cta');
+  if (!stack || !panel || !cta) return;
+
+  const imgRect   = stack.getBoundingClientRect();
+  const panelW    = Math.ceil(panel.offsetWidth || 360);
+  const vw        = window.innerWidth;
+  const gutter    = 24;
+  const screenPad = 16;
+  const nominal   = vw * 0.68 + 280;
+
+  let left = Math.max(imgRect.right + gutter, nominal);
+
+  if (left + panelW + screenPad > vw) {
+    left = Math.max(screenPad, vw - panelW - screenPad);
+  }
+
+  document.documentElement.style
+    .setProperty('--look-panel-left', Math.round(left) + 'px');
+}
+
+window.addEventListener('load', layoutLookPanel);
+window.addEventListener('resize', () => {
+  layoutLookPanel();
+  try { centerCreditToHero(); } catch(_){}
+});
 
 window.addEventListener('load', centerCreditToHero);
 window.addEventListener('resize', centerCreditToHero);
