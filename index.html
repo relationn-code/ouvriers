@@ -411,7 +411,7 @@ transform: translate(-3px,10px);
 
 .profile-rest{ flex: 1 1 auto; }
 .profile-footer-logo{
-  width: clamp(120px, 12vw, 200px);
+  width: var(--footer-logo-w);
   height: auto;
 }
 
@@ -762,6 +762,7 @@ transform: translate(-3px,10px);
   --glide-oh: -7px;
   --glide-oy: 7px;
   --page-bottom: 250px;
+  --footer-logo-w: clamp(120px, 12vw, 200px);
 }
 
 #intro .intro-nav,
@@ -1049,7 +1050,7 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
 }
 
 .products-footer-logo{
-  width: clamp(120px, 12vw, 200px);
+  width: var(--footer-logo-w);
   height: auto;
 }
 
@@ -1332,7 +1333,7 @@ body.show-intro #intro a.intro-story::after,
 }
 
 #gallery .gallery-footer-logo{
-  width: clamp(120px, 12vw, 200px);
+  width: var(--footer-logo-w);
   height: auto;
 }
 
@@ -1829,8 +1830,6 @@ src="https://res.cloudinary.com/daizpzcxl/image/upload/f_auto,q_auto,dpr_auto,c_
 </section>
   <!-- 2. Gallery -->
   <section id="gallery">
-
-<figure class="gallery-banner">
 <figure class="gallery-banner">
   <img src="images/gallery-banner.png" alt="Les Ouvriers — 모든 룩">
 </figure>
