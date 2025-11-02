@@ -311,12 +311,18 @@ transform: translateY(65px);
 }
 
 :root{
-  --prof-size: clamp(27px, 1.9vw, 27px);
-  --prof-weight: 500;
-  --prof-gap: 18px;
+  --prof-size: clamp(28px, 1.35vw, 38px);
+  --prof-gap:  clamp(10px, 1.15vw, 18px);
   --prof-line-height: 1.8;
   --prof-letter: .1px;
-  --prof-offset: 75px
+  --prof-offset: clamp(24px, 6vw, 120px);
+  --credits-size: clamp(24px, 1.15vw, 30px);
+  --credits-line: 1.6;
+  --credits-maxw: clamp(340px, 38vw, 640px);
+  --credits-art-w: clamp(400px, 24vw, 640px);
+  --credits-art-right: clamp(6vw, 17vw, 22vw);
+  --credits-art-opacity: .85;
+  --credits-letter: .1px;
 }
 
 #profile, #credits{
@@ -335,12 +341,13 @@ transform: translateY(65px);
 #profile .profile-right-art{
   position: absolute;
   top: 49%;
-  right: 15vw;
   transform: translateY(-50%);
-  width: 320px;
+  right: clamp(6vw, 15vw, 20vw);
+  width: clamp(220px, 22vw, 420px);
+  height: auto;
   object-fit: cover;
-  z-index: 0;
-  pointer-events: none;       
+  pointer-events: none;
+  z-index: 0;  
   filter: none;
   opacity: 0.05
 }
@@ -367,11 +374,11 @@ transform: translateY(65px);
 }
 
 .profile-info{
-  max-width: 520px;
+  max-width: clamp(420px, 36vw, 620px);
   margin-left: var(--prof-offset);
   font-size: var(--prof-size);
-  font-weight: var(--prof-weight);
   line-height: var(--prof-line-height);
+  font-weight: var(--prof-weight);
   letter-spacing: var(--prof-letter);
 }
 
@@ -420,27 +427,27 @@ transform: translate(-3px,10px);
 }
 #credits .credits-info{
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -60%);
+  top: 45%;
+  left: 60%;
+  transform: translate(-50%, -50%);
   margin: 0;
   text-align: left;
-  font-size: 24px;
-  line-height: 0.7;
-  letter-spacing: var(--prof-letter);
+  font-size: var(--credits-size);
+  line-height: var(--credits-line);
+  letter-spacing: var(--credits-letter);
   font-weight: var(--prof-weight);
   color: #999899;
-  max-width: 450px;
-  width: min(88vw, 620px);
+  max-width: var(--credits-maxw);
+  width: min(88vw, var(--credits-maxw));
   z-index: 1;
 }
 #credits .profile-left::after{
   content: "";
   position: absolute;
   top: 50%;
-  right: 17vw;
+  right: var(--credits-art-right);
   transform: translateY(-47%);
-  width: 400px;
+  width: var(--credits-art-w);
   aspect-ratio: 3/4;
   background: url("https://res.cloudinary.com/daizpzcxl/image/upload/f_auto,q_auto,dpr_auto,c_limit,w_1400/credits-art.jpg") center/cover no-repeat;
   opacity: .9;
@@ -1271,9 +1278,9 @@ body.show-intro #intro a.intro-story::after,
 
 /*GALLERY: 이미지 배너 헤더 */
 :root{
-  --gallery-banner-h: 180px;
-  --gallery-banner-top: 1.0rem;  
-  --gallery-banner-bottom: 5.5rem;
+  --gallery-banner-h: clamp(60px, 14vw, 180px);
+  --gallery-banner-top: clamp(0.5rem, 1.2vw, 1.2rem);
+  --gallery-banner-bottom: clamp(2.8rem, 4.2vw, 6rem);
   --gallery-grid-top: 0rem;
   --caption-offset: 13px;
 }
@@ -1290,10 +1297,10 @@ body.show-intro #intro a.intro-story::after,
 }
 
 #gallery .gallery-banner img{
-  display: block;
-  height: var(--gallery-banner-h); 
-  width: auto; 
+  height: var(--gallery-banner-h);
+  width: auto;
   object-fit: contain;
+  display: block;
 }
 
 #gallery .gallery-grid{
@@ -1824,6 +1831,7 @@ src="https://res.cloudinary.com/daizpzcxl/image/upload/f_auto,q_auto,dpr_auto,c_
   <section id="gallery">
 
 <figure class="gallery-banner">
+<figure class="gallery-banner">
   <img src="images/gallery-banner.png" alt="Les Ouvriers — 모든 룩">
 </figure>
   <div class="gallery-grid" id="galleryGrid"></div>
@@ -1969,10 +1977,10 @@ src="https://res.cloudinary.com/daizpzcxl/image/upload/f_auto,q_auto,dpr_auto,c_
   <div class="profile-wrap">
     <div class="profile-left">
       <div class="profile-info credits-info" role="contentinfo" aria-label="Credits">
-        <br>designer (garment,web)<br>
-        <br>UI engineer  /  choidawon<br> <br><br>
-        <br>illustrator  /  J.Han<br><br><br>
-        <br>painter  /  Erwan bouroullec<br><br><br><br><br><br>
+        <br>designer (garment,web)
+        <br>UI engineer  /  choidawon<br>
+        <br>illustrator  /  J.Han<br>
+        <br>painter  /  Erwan bouroullec<br><br>
         <br>@2025 ouvrier.<br>
       </div>
     </div>
