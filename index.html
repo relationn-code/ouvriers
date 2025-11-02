@@ -5550,16 +5550,20 @@ function layoutLookPanel(){
   const lookSec = document.getElementById('look');
   if (!lookSec || lookSec.hidden) return;
 
-  const stack  = document.getElementById('lookStack');
-  const panel  = document.getElementById('right-panel');
-  const cta    = document.getElementById('detail-cta');
-  if (!stack || !panel || !cta) return;
+  const panel = document.getElementById('right-panel');
+  const cta   = document.getElementById('detail-cta');
+  const vis   = lookSec.querySelector('.look-img.is-visible') 
+             || document.getElementById('lookImgA') 
+             || document.getElementById('lookImgB');
+  if (!panel || !cta || !vis) return;
 
-  const imgRect   = stack.getBoundingClientRect();
+  const imgRect   = vis.getBoundingClientRect();
   const panelW    = Math.ceil(panel.offsetWidth || 360);
+
   const vw        = window.innerWidth;
   const gutter    = 24;
   const screenPad = 16;
+
   const nominal   = vw * 0.68 + 280;
 
   let left = Math.max(imgRect.right + gutter, nominal);
@@ -5571,6 +5575,33 @@ function layoutLookPanel(){
   document.documentElement.style
     .setProperty('--look-panel-left', Math.round(left) + 'px');
 }
+
+(() => {
+  const lookSec = document.getElementById('look');
+  const panel   = document.getElementById('right-panel');
+  const cta     = document.getElementById('detail-cta');
+  const vis     = lookSec?.querySelector('.look-img.is-visible') 
+               || document.getElementById('lookImgA');
+
+  if (!lookSec || !panel) return;
+
+  const ro = new ResizeObserver(() => layoutLookPanel());
+  ro.observe(panel);
+  if (cta) ro.observe(cta);
+  if (vis) ro.observe(vis);
+
+  [document.getElementById('lookImgA'), document.getElementById('lookImgB')]
+    .forEach(im => {
+      if (!im) return;
+      im.addEventListener('load', () => layoutLookPanel(), { passive:true });
+    });
+
+  window.addEventListener('load',  layoutLookPanel);
+  window.addEventListener('resize', () => {
+    layoutLookPanel();
+    try { centerCreditToHero(); } catch(_){}
+  });
+})();
 
 window.addEventListener('load', layoutLookPanel);
 window.addEventListener('resize', () => {
