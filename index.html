@@ -123,20 +123,6 @@ section[hidden] { display:none !important; pointer-events:none !important; }
 #gallery .gallery-cta-btn:active{
   transform: translateY(1px);
 }
-
-
-    .container {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-    .left-text-block {
-      position: absolute;
-      top: 50%;
-      left: 25%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-    }
     .title {
       font-family: 'Le French', serif;
       font-weight: 550;
@@ -164,7 +150,7 @@ section[hidden] { display:none !important; pointer-events:none !important; }
   color: #aaa;
   position: absolute;
   visibility: hidden;
- top: 80% !important;
+  top: 80%;
     }
     .view-all {
       position: absolute;
@@ -314,15 +300,15 @@ transform: translateY(65px);
 }
 
 :root{
-  --prof-size: clamp(30px, 1.35vw, 44px);
+  --prof-size: clamp(30px, 1.35vw, 60px);
   --prof-gap:  clamp(12px, 1.15vw, 20px);
   --prof-line-height: 1.8;
   --prof-letter: .1px;
   --prof-offset: clamp(24px, 6vw, 120px);
-  --credits-size: clamp(24px, 1.15vw, 36px);
+  --credits-size: clamp(24px, 1.15vw, 50px);
   --credits-line: 1.6;
   --credits-maxw: clamp(400px, 38vw, 680px);
-  --credits-art-w: clamp(450px, 24vw, 700px);
+  --credits-art-w: clamp(450px, 24vw, 1200px);
   --credits-art-right: clamp(6vw, 17vw, 22vw);
   --credits-art-opacity: .85;
   --credits-letter: .1px;
@@ -346,7 +332,7 @@ transform: translateY(65px);
   top: 49%;
   transform: translateY(-50%);
   right: clamp(6vw, 15vw, 20vw);
-  width: clamp(340px, 22vw, 560px);
+  width: clamp(340px, 22vw, 900px);
   height: auto;
   object-fit: cover;
   pointer-events: none;
@@ -1560,7 +1546,7 @@ body.show-intro #intro a.intro-story::after,
 }
 
 #list .info{
-  overflow: auto;
+  overflow: hidden;
   padding: 0 6px 0 var(--list-info-shift);
   gap: var(--list-gap-base);
   letter-spacing: var(--list-letter);
@@ -1766,10 +1752,36 @@ img, svg {
   animation: storyRiseFade 640ms cubic-bezier(.22,.61,.36,1) 1100ms forwards;
 }
 
+#list{
+  --list-lookno-size: clamp(18px, 0.8rem + 0.6vw, 36px); 
+  --list-name-size:   clamp(24px, 1.0rem + 1.2vw, 54px);
+  --list-color-size:  clamp(13px, 0.6rem + 0.45vw, 28px);
+  --list-spec-size:   clamp(13px, 0.55rem + 0.35vw, 26px);
+  --list-chip:                clamp(18px, 1.2vw, 38px);
+  --list-chip-border:         clamp(1px, 0.08rem + 0.05vw, 2px);
+  --list-chip-border-active:  clamp(2px, 0.12rem + 0.08vw, 3px);
+  --list-chips-gap: clamp(6px, 0.5vw, 16px);
+}
+#list .look-no{ font-size: var(--list-lookno-size); }
+#list .name{    font-size: var(--list-name-size); }
+#list .color-name{ font-size: var(--list-color-size); }
+#list .spec{ font-size: var(--list-spec-size); }
+#list .spec-wrap .spec{ font-size: var(--list-spec-size); }
+#list .chips{ gap: var(--list-chips-gap); }
+#list .chip{
+  width: var(--list-chip);
+  height: var(--list-chip);
+  border-width: var(--list-chip-border);
+}
+#list .chip.active{
+  border-width: var(--list-chip-border-active);
+}
+
 @keyframes storyRiseFade{
   from{ opacity:0; transform: translateY(12px); }
   to  { opacity:1; transform: translateY(0);    }
 }
+
 
   </style>
 </head>
