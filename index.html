@@ -670,8 +670,25 @@ transform: translate(-3px,10px);
 .story-wrap{
   min-height: 100dvh;
   display: grid;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto 1fr auto;
   padding: var(--story-pad-t) var(--story-pad-x) 0 !important;
+}
+.story-bundle{
+  justify-self: center;
+  align-self: center;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--story-head-gap);
+  margin: 0;
+}
+.story-banner{ margin-top: 0; }
+#story .story-lead{
+  margin: 0;
+}
+#story .story-title-img{
+  width: var(--story-title-w);
+  height: auto;
 }
 .story-label{
   text-align:center;
@@ -724,8 +741,8 @@ transform: translate(-3px,10px);
 }
 .story-banner img{
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
   object-position: center bottom;
   display: block;
   will-change: transform, opacity;
@@ -1176,20 +1193,10 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
   --story-pad-x: clamp(16px, 4vw, 80px);
   --story-pad-t: clamp(24px, 6vmin, 140px);
   --story-gap:   clamp(16px, 3vmin, 48px);
-  --story-equal-gap: clamp(25px, 2.8vmin, 65px);
+  --story-equal-gap: clamp(35px, 2.8vmin, 70px);
   --story-head-gap: clamp(10px, 2.6vmin, 32px);
+  --story-back-nudge: clamp(8px, 1.8vmin, 20px);
 }
-#story .story-head{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--story-head-gap);
-  margin-block: var(--story-equal-gap);
-  text-align: center;
-}
-
-#story .story-head .story-title{ margin: 0; }
-#story .story-head .story-lead { margin: 0; }
 #story .story-back{ margin: 0 auto 0; }
 #story .story-banner{ margin-top: 0; }
 #story .story-wrap{
@@ -1202,7 +1209,7 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
   background: transparent;
   position: relative;
   z-index: 2;
-  margin-top: var(--story-back-top);
+  transform: translateY(var(--story-back-nudge));
 }
 
 #story .story-back-img{
@@ -1813,8 +1820,7 @@ img, svg {
   <img src="images/chevron-up.png" alt="" class="story-back-img">
 </button>
 
-    <!-- 타이틀 -->
-  <div class="story-head" role="group" aria-label="Story heading">
+<div class="story-bundle" role="group" aria-label="Story">
     <h2 class="story-title">
       <img src="images/story-title.png" alt="Ouvriers" class="story-title-img">
     </h2>
