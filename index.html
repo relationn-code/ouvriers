@@ -795,6 +795,7 @@ transform: translate(-3px,10px);
   --logo-w: 180px;
   --logo-top: 50px;
   --logo-left: 58px;
+  --look-image-left: 68%;
 }
 
 .site-logo{
@@ -877,8 +878,10 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
 }
 
 #look .image-container{
-  position:absolute; top:50%; left:68%;
+  position:absolute; top:50%;
+  left: var(--look-image-left, 68%);
   transform: translate(-50%, -50%);
+  transition: left 160ms cubic-bezier(.22,.61,.36,1);
 }
 #look .look-stack{
   position: relative;
@@ -5337,6 +5340,8 @@ const __w = [800, 1200, 1600, 2000];
 
   centerCreditToHero?.();
   layoutLookPanel();
+  try { window.resolveLookCollision?.({ allowBackoff: false }); } catch(_){}
+  requestAnimationFrame(() => { try { window.resolveLookCollision?.({ allowBackoff: true }); } catch(_){} });
  const credit = document.getElementById('credit');
  if (credit) credit.style.visibility = 'hidden';
 }
@@ -5484,6 +5489,8 @@ await ensureDecoded(show, 360);
         lockStackSize(false);
         layoutLookPanel();
         try { centerCreditToHero(); } catch(_){}
+  try { window.resolveLookCollision?.({ allowBackoff: false }); } catch(_){}
+  requestAnimationFrame(() => { try { window.resolveLookCollision?.({ allowBackoff: true }); } catch(_){} });
       });
     }
   } finally {
@@ -5600,7 +5607,84 @@ function layoutLookPanel(){
 
   document.documentElement.style
     .setProperty('--look-panel-left', Math.round(left) + 'px');
+  try { window.resolveLookCollision?.({ allowBackoff: true }); } catch(_){}
 }
+
+(() => {
+  const CFG = {
+    startLeft: 68,
+    minLeft: 60,
+    step: 2,
+    gutter: 16,
+    hysteresis: 8,
+    maxStepsPerCall: 4
+  };
+
+  const docEl = document.documentElement;
+  const getLeft = () => {
+    const v = docEl.style.getPropertyValue('--look-image-left') || getComputedStyle(document.querySelector('#look .image-container')).left;
+    const m = String(v).match(/([\d.]+)%/); 
+    return m ? parseFloat(m[1]) : CFG.startLeft;
+  };
+  const setLeft = (p) => docEl.style.setProperty('--look-image-left', `${p}%`);
+  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+
+  function measure() {
+    const look = document.getElementById('look');
+    if (!look || look.hidden) return null;
+
+    const img = look.querySelector('.look-img.is-visible') || document.getElementById('lookImgA') || document.getElementById('lookImgB');
+    const panel = document.getElementById('right-panel');
+    if (!img || !panel) return null;
+
+    const imgRect = img.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    return { imgRect, panelRect };
+  }
+
+  function isColliding({ imgRect, panelRect }) {
+    return (imgRect.right + CFG.gutter) > panelRect.left;
+  }
+
+  function resolveLookCollision({ allowBackoff = true } = {}) {
+    const pack = measure();
+    if (!pack) return;
+    let { imgRect, panelRect } = pack;
+
+    let left = getLeft();
+    let steps = 0;
+
+    while (isColliding({ imgRect, panelRect }) && left > CFG.minLeft && steps < CFG.maxStepsPerCall) {
+      left = clamp(left - CFG.step, CFG.minLeft, CFG.startLeft);
+      setLeft(left);
+      steps += 1;
+      const m = measure();
+      if (!m) break;
+      imgRect = m.imgRect; panelRect = m.panelRect;
+    }
+
+    if (allowBackoff && left < CFG.startLeft) {
+      const gap = panelRect.left - (imgRect.right);
+      if (gap >= (CFG.gutter + CFG.hysteresis)) {
+        const up = clamp(left + CFG.step, CFG.minLeft, CFG.startLeft);
+        if (up !== left) setLeft(up);
+      }
+    }
+  }
+
+  window.resolveLookCollision = resolveLookCollision;
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      requestAnimationFrame(() => resolveLookCollision({ allowBackoff: true }));
+    }).catch(()=>{});
+  }
+
+  const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn.apply(null, a), ms); }; };
+  window.addEventListener('resize', debounce(() => {
+    resolveLookCollision({ allowBackoff: true });
+  }, 120));
+})();
 
 (() => {
   const lookSec = document.getElementById('look');
