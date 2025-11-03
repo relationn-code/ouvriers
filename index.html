@@ -888,13 +888,30 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
 #look .look-img{
   position:absolute; top:50%; left:50%;
   transform: translate(-50%, -50%);
-  width:auto; height:auto; max-height:80vh; object-fit:contain;
+  width:auto;
+  height:auto; 
+  max-height: var(--look-img-max-h, 80vh);
+  object-fit:contain;
   visibility: hidden;
   opacity: 0;
   transition: opacity var(--look-fade-in) var(--look-ease);
   will-change: opacity;
 }
+#look[data-mode="stack"] .right-panel,
+#look[data-mode="stack"] .detail-cta{
+  left: 50% !important;
+  transform: translateX(-50%);
+}
 
+#look[data-mode="stack"] .right-panel{
+  bottom: calc(12vh + 56px);
+  max-width: min(560px, 90vw);
+  text-align: left;
+}
+
+#look[data-mode="stack"] .detail-cta{
+  bottom: 10vh;
+}
 #look .look-img.is-visible{
   visibility: visible;
   opacity: 1;
@@ -5583,23 +5600,56 @@ function layoutLookPanel(){
              || document.getElementById('lookImgB');
   if (!panel || !cta || !vis) return;
 
-  const imgRect   = vis.getBoundingClientRect();
-  const panelW    = Math.ceil(panel.offsetWidth || 360);
+  const gutter     = 24;
+  const screenPad  = 16;
+  const minImgVH   = 48;
+  const baseImgVH  = 80;
 
-  const vw        = window.innerWidth;
-  const gutter    = 24;
-  const screenPad = 16;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
 
-  const nominal   = vw * 0.68 + 280;
+  const panelW   = Math.ceil(panel.offsetWidth || 360);
+  const imgRect  = vis.getBoundingClientRect();
+  const nominalLeft = vw * 0.68 + 280; // 기존 로직 유지
+  let left = Math.max(imgRect.right + gutter, nominalLeft);
 
-  let left = Math.max(imgRect.right + gutter, nominal);
-
-  if (left + panelW + screenPad > vw) {
-    left = Math.max(screenPad, vw - panelW - screenPad);
+  if (left + panelW + screenPad <= vw) {
+    document.documentElement.style.setProperty('--look-panel-left', Math.round(left) + 'px');
+    lookSec.removeAttribute('data-mode');
+    document.documentElement.style.removeProperty('--look-img-max-h');
+    return;
   }
+const centerX        = 0.68 * vw;
+  const needRightClear = panelW + screenPad + gutter;
+  const maxRightEdge   = vw - needRightClear;
+  const widthMax       = 2 * Math.max(0, maxRightEdge - centerX);
+  const naturalW = vis.naturalWidth  || imgRect.width  || 1;
+  const naturalH = vis.naturalHeight || imgRect.height || 1;
+  const ar       = naturalW / naturalH;
 
-  document.documentElement.style
-    .setProperty('--look-panel-left', Math.round(left) + 'px');
+  const hPxByRight = widthMax > 0 ? (widthMax / Math.max(ar, 0.0001)) : 0;
+  const hVhByRight = (hPxByRight / vh) * 100;
+
+  let targetImgVH = Math.min(baseImgVH, Math.max(0, hVhByRight));
+
+  if (targetImgVH >= minImgVH) {
+    const px = Math.floor((targetImgVH / 100) * vh);
+    document.documentElement.style.setProperty('--look-img-max-h', px + 'px');
+    requestAnimationFrame(() => {
+      const newRect = vis.getBoundingClientRect();
+      let newLeft = Math.max(newRect.right + gutter, nominalLeft);
+      newLeft = Math.min(newLeft, vw - panelW - screenPad);
+
+      document.documentElement.style.setProperty('--look-panel-left', Math.round(newLeft) + 'px');
+      lookSec.removeAttribute('data-mode');
+    });
+    return;
+  }
+  lookSec.setAttribute('data-mode', 'stack');
+  document.documentElement.style.removeProperty('--look-panel-left');
+  const stackImgVH = 68;
+  const px = Math.floor((stackImgVH / 100) * vh);
+  document.documentElement.style.setProperty('--look-img-max-h', px + 'px');
 }
 
 (() => {
