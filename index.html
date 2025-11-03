@@ -1279,9 +1279,10 @@ body.show-intro #intro a.intro-story::after,
 
 /*GALLERY: 이미지 배너 헤더 */
 :root{
-  --gallery-banner-h: clamp(60px, 14vw, 180px);
+  --gallery-banner-w: clamp(280px, 70vw, 1160px);
+  --gallery-banner-maxh: clamp(60px, 18vh, 220px);
   --gallery-banner-top: clamp(0.5rem, 1.2vw, 1.2rem);
-  --gallery-banner-bottom: clamp(2.8rem, 4.2vw, 6rem);
+  --gallery-banner-bottom: clamp(2rem, 4vw, 6rem);
   --gallery-grid-top: 0rem;
   --caption-offset: 13px;
 }
@@ -1290,16 +1291,17 @@ body.show-intro #intro a.intro-story::after,
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-
   margin-top: var(--gallery-banner-top);
   margin-bottom: var(--gallery-banner-bottom);
-
-  padding: 0; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
-
 #gallery .gallery-banner img{
-  height: var(--gallery-banner-h);
-  width: auto;
+  width: var(--gallery-banner-w);
+  height: auto;
+  max-height: var(--gallery-banner-maxh);
   object-fit: contain;
   display: block;
 }
