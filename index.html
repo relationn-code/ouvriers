@@ -161,12 +161,6 @@ section[hidden] { display:none !important; pointer-events:none !important; }
       z-index: 10;
       opacity: 0.3
     }
-    .image-container {
-      position: absolute;
-      top: 50%;
-      left: 68%;
-      transform: translate(-50%, -50%);
-    }
     .image-container img {
       max-height: 80vh;
       width: auto;
@@ -829,10 +823,6 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
 .site-nav a:hover{ text-decoration: underline; }
 
 #products{ padding-top: 0 !important; }
-.right-panel{
-  max-width: 360px; 
-  bottom: clamp(40px, 12vh, 18vh);
-}
 
 @media (max-width: 1024px){
   :root{
@@ -915,6 +905,8 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
   max-width: 360px;
   text-align: left;
   z-index: 2;
+  max-width: min(360px, calc(100vw - var(--look-panel-left, 0px) - 24px));
+  contain: layout paint style;
 }
 
 
@@ -5609,13 +5601,13 @@ function _layoutLookPanelCore(){
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  const GUTTER       = 24;
-  const SCREEN_PAD   = 16;
-  const SAFE_BUFFER  = 12;
-  const MIN_IMG_VH   = 48;
-  const BASE_IMG_VH  = 80;
-  const STACK_IMG_VH = 68;
-  const NOMINAL_LEFT = vw * 0.68 + 280;
+const GUTTER       = 28;
+const SCREEN_PAD   = 18;
+const SAFE_BUFFER  = 20;
+const MIN_IMG_VH   = 50;
+const BASE_IMG_VH  = 80;
+const STACK_IMG_VH = 64;
+const NOMINAL_LEFT = vw * 0.68 + 280;
 
 
   let imgRect = vis.getBoundingClientRect();
@@ -5655,7 +5647,7 @@ function _layoutLookPanelCore(){
         document.documentElement.style.setProperty('--look-panel-left', Math.round(clamped) + 'px');
         if (lookSec.dataset.mode === 'stack') {
           const extraFits = (clamped + panelW + SCREEN_PAD + 24) <= vw;
-          if (extraFits && (performance.now() - __lookLayout.switchHoldTs) > 150) {
+          if (extraFits && (performance.now() - __lookLayout.switchHoldTs) > 450) {
             lookSec.removeAttribute('data-mode');
             __lookLayout.lastMode = 'side';
           }
@@ -5667,7 +5659,7 @@ function _layoutLookPanelCore(){
 
   const now = performance.now();
   if (!fitsRight) {
-    if (__lookLayout.lastMode !== 'stack' && (now - __lookLayout.switchHoldTs) > 150) {
+    if (__lookLayout.lastMode !== 'stack' && (now - __lookLayout.switchHoldTs) > 450) {
       lookSec.setAttribute('data-mode', 'stack');
       __lookLayout.lastMode = 'stack';
       __lookLayout.switchHoldTs = now;
@@ -5678,7 +5670,7 @@ function _layoutLookPanelCore(){
     return;
   }
 
-  if (__lookLayout.lastMode !== 'side' && (now - __lookLayout.switchHoldTs) > 150) {
+  if (__lookLayout.lastMode !== 'side' && (now - __lookLayout.switchHoldTs) > 450) {
     lookSec.removeAttribute('data-mode');
     __lookLayout.lastMode = 'side';
     __lookLayout.switchHoldTs = now;
@@ -5686,6 +5678,7 @@ function _layoutLookPanelCore(){
 
   document.documentElement.style.removeProperty('--look-img-max-h');
   const clamped = Math.min(leftCandidate, vw - panelW - SCREEN_PAD - SAFE_BUFFER);
+const clampedSafe = Math.max(clamped, Math.floor(imgRect.right) + GUTTER + 2);
   document.documentElement.style.setProperty('--look-panel-left', Math.round(clamped) + 'px');
 }
 
