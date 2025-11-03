@@ -78,8 +78,11 @@ section[hidden] { display:none !important; pointer-events:none !important; }
   grid-template-columns: repeat(4, minmax(0,1fr));
   column-gap: 24px;
   row-gap: 35px;
-  max-width:1440px;
-  margin: 2.5rem auto 0; 
+  flex: 0 0 auto;
+  margin-top: var(--gallery-grid-top);
+  width: 100%;
+  max-width: none;
+  margin: var(--gallery-grid-top) 0 0;
 }
     #gallery .thumb {
       cursor: default;
@@ -1279,7 +1282,7 @@ body.show-intro #intro a.intro-story::after,
 
 /*GALLERY: 이미지 배너 헤더 */
 :root{
-  --gallery-banner-h: clamp(180px, 22vh, 500px);
+  --gallery-banner-h: clamp(120px, 10vh, 450px);
   --gallery-banner-top: clamp(0.5rem, 1.2vw, 1.2rem);
   --gallery-banner-bottom: clamp(2rem, 4vw, 6rem);
   --gallery-grid-top: 0rem;
@@ -1303,10 +1306,6 @@ body.show-intro #intro a.intro-story::after,
   margin-left: 0;
 }
 
-#gallery .gallery-grid{
-  margin-top: var(--gallery-grid-top);
-}
-
 /* GALLERY  */
 #gallery{
   display: flex;     
@@ -1314,8 +1313,6 @@ body.show-intro #intro a.intro-story::after,
   min-height: 100dvh;
   padding: 140px 50px 0; 
 }
-
-#gallery .gallery-grid{ flex: 0 0 auto; }
 
 #gallery .gallery-rest{
   flex: 1 1 auto;
