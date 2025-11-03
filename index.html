@@ -176,14 +176,6 @@ section[hidden] { display:none !important; pointer-events:none !important; }
     .image-container img.fade-out {
       opacity: 0;
     }
-    .right-panel {
-      position: absolute;
-      left: calc(68% + 280px);
-      bottom: 18vh;
-      text-align: left;
-      font-size: 16px;
-      line-height: 1.7;
-    }
     .right-panel span {
       font-weight: bold;
     }
@@ -5589,7 +5581,21 @@ document.addEventListener('DOMContentLoaded', () => {
    credit.style.top  = top  + 'px';
  }
 
+const __lookLayout = {
+  lastMode: 'side',
+  lastRect: null,
+  raf: 0,
+  switchHoldTs: 0,
+};
+
 function layoutLookPanel(){
+  if (__lookLayout.raf) cancelAnimationFrame(__lookLayout.raf);
+  __lookLayout.raf = requestAnimationFrame(_layoutLookPanelCore);
+}
+
+function _layoutLookPanelCore(){
+  __lookLayout.raf = 0;
+
   const lookSec = document.getElementById('look');
   if (!lookSec || lookSec.hidden) return;
 
@@ -5600,56 +5606,87 @@ function layoutLookPanel(){
              || document.getElementById('lookImgB');
   if (!panel || !cta || !vis) return;
 
-  const gutter     = 24;
-  const screenPad  = 16;
-  const minImgVH   = 48;
-  const baseImgVH  = 80;
-
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  const panelW   = Math.ceil(panel.offsetWidth || 360);
-  const imgRect  = vis.getBoundingClientRect();
-  const nominalLeft = vw * 0.68 + 280; // 기존 로직 유지
-  let left = Math.max(imgRect.right + gutter, nominalLeft);
+  const GUTTER       = 24;
+  const SCREEN_PAD   = 16;
+  const SAFE_BUFFER  = 12;
+  const MIN_IMG_VH   = 48;
+  const BASE_IMG_VH  = 80;
+  const STACK_IMG_VH = 68;
+  const NOMINAL_LEFT = vw * 0.68 + 280;
 
-  if (left + panelW + screenPad <= vw) {
-    document.documentElement.style.setProperty('--look-panel-left', Math.round(left) + 'px');
-    lookSec.removeAttribute('data-mode');
-    document.documentElement.style.removeProperty('--look-img-max-h');
-    return;
+
+  let imgRect = vis.getBoundingClientRect();
+  if (!imgRect.width || !imgRect.height) {
+    if (__lookLayout.lastRect) imgRect = __lookLayout.lastRect;
+  } else {
+    __lookLayout.lastRect = imgRect;
   }
-const centerX        = 0.68 * vw;
-  const needRightClear = panelW + screenPad + gutter;
-  const maxRightEdge   = vw - needRightClear;
-  const widthMax       = 2 * Math.max(0, maxRightEdge - centerX);
-  const naturalW = vis.naturalWidth  || imgRect.width  || 1;
-  const naturalH = vis.naturalHeight || imgRect.height || 1;
-  const ar       = naturalW / naturalH;
 
-  const hPxByRight = widthMax > 0 ? (widthMax / Math.max(ar, 0.0001)) : 0;
-  const hVhByRight = (hPxByRight / vh) * 100;
+  const panelW = Math.ceil(panel.offsetWidth || 360);
 
-  let targetImgVH = Math.min(baseImgVH, Math.max(0, hVhByRight));
+  const leftCandidate = Math.max(imgRect.right + GUTTER, NOMINAL_LEFT);
+  const fitsRight = (leftCandidate + panelW + SCREEN_PAD) <= (vw - SAFE_BUFFER);
 
-  if (targetImgVH >= minImgVH) {
-    const px = Math.floor((targetImgVH / 100) * vh);
+  if (!fitsRight) {
+    const naturalW = vis.naturalWidth  || imgRect.width  || 1;
+    const naturalH = vis.naturalHeight || imgRect.height || 1;
+    const ar = naturalW / naturalH;
+
+    const centerX        = 0.68 * vw;
+    const needRightClear = panelW + SCREEN_PAD + GUTTER + SAFE_BUFFER;
+    const maxRightEdge   = vw - needRightClear;
+    const widthMax       = 2 * Math.max(0, maxRightEdge - centerX);
+    const hPxByRight     = widthMax > 0 ? (widthMax / Math.max(ar, 0.0001)) : 0;
+    const hVhByRight     = (hPxByRight / vh) * 100;
+    const targetImgVH    = Math.min(BASE_IMG_VH, Math.max(0, hVhByRight));
+
+    if (targetImgVH >= MIN_IMG_VH) {
+      const px = Math.floor((targetImgVH / 100) * vh);
+      document.documentElement.style.setProperty('--look-img-max-h', px + 'px');
+
+      requestAnimationFrame(() => {
+        const newRect = vis.getBoundingClientRect();
+        const newLeft = Math.max(newRect.right + GUTTER, NOMINAL_LEFT);
+        const clamped = Math.min(newLeft, vw - panelW - SCREEN_PAD - SAFE_BUFFER);
+
+        document.documentElement.style.setProperty('--look-panel-left', Math.round(clamped) + 'px');
+        if (lookSec.dataset.mode === 'stack') {
+          const extraFits = (clamped + panelW + SCREEN_PAD + 24) <= vw;
+          if (extraFits && (performance.now() - __lookLayout.switchHoldTs) > 150) {
+            lookSec.removeAttribute('data-mode');
+            __lookLayout.lastMode = 'side';
+          }
+        }
+      });
+      return;
+    }
+  }
+
+  const now = performance.now();
+  if (!fitsRight) {
+    if (__lookLayout.lastMode !== 'stack' && (now - __lookLayout.switchHoldTs) > 150) {
+      lookSec.setAttribute('data-mode', 'stack');
+      __lookLayout.lastMode = 'stack';
+      __lookLayout.switchHoldTs = now;
+    }
+    document.documentElement.style.removeProperty('--look-panel-left');
+    const px = Math.floor((STACK_IMG_VH / 100) * vh);
     document.documentElement.style.setProperty('--look-img-max-h', px + 'px');
-    requestAnimationFrame(() => {
-      const newRect = vis.getBoundingClientRect();
-      let newLeft = Math.max(newRect.right + gutter, nominalLeft);
-      newLeft = Math.min(newLeft, vw - panelW - screenPad);
-
-      document.documentElement.style.setProperty('--look-panel-left', Math.round(newLeft) + 'px');
-      lookSec.removeAttribute('data-mode');
-    });
     return;
   }
-  lookSec.setAttribute('data-mode', 'stack');
-  document.documentElement.style.removeProperty('--look-panel-left');
-  const stackImgVH = 68;
-  const px = Math.floor((stackImgVH / 100) * vh);
-  document.documentElement.style.setProperty('--look-img-max-h', px + 'px');
+
+  if (__lookLayout.lastMode !== 'side' && (now - __lookLayout.switchHoldTs) > 150) {
+    lookSec.removeAttribute('data-mode');
+    __lookLayout.lastMode = 'side';
+    __lookLayout.switchHoldTs = now;
+  }
+
+  document.documentElement.style.removeProperty('--look-img-max-h');
+  const clamped = Math.min(leftCandidate, vw - panelW - SCREEN_PAD - SAFE_BUFFER);
+  document.documentElement.style.setProperty('--look-panel-left', Math.round(clamped) + 'px');
 }
 
 (() => {
@@ -5678,12 +5715,6 @@ const centerX        = 0.68 * vw;
     try { centerCreditToHero(); } catch(_){}
   });
 })();
-
-window.addEventListener('load', layoutLookPanel);
-window.addEventListener('resize', () => {
-  layoutLookPanel();
-  try { centerCreditToHero(); } catch(_){}
-});
 
 window.addEventListener('load', centerCreditToHero);
 window.addEventListener('resize', centerCreditToHero);
