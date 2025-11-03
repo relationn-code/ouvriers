@@ -671,7 +671,6 @@ transform: translate(-3px,10px);
   min-height: 100dvh;
   display: grid;
   grid-template-rows: auto auto 1fr;
-  row-gap: var(--story-gap);
   padding: var(--story-pad-t) var(--story-pad-x) 0 !important;
 }
 .story-label{
@@ -682,7 +681,6 @@ transform: translate(-3px,10px);
 }
 .story-back{
   display:block;
-  margin: 0 auto 18px;
   background:transparent;
   border:0;
   font-size: 20px;
@@ -714,7 +712,6 @@ transform: translate(-3px,10px);
   font-weight: 500;
   line-height: 1.9;
   color:#222;
-  margin: 14px auto 26px;
   max-width: 720px;
 }
 .story-banner{
@@ -1170,7 +1167,6 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
 /* STORY 헤더 최종 오버라이드 */
 :root{
   --story-title-top: clamp(16px, 3vmin, 72px);
-  --story-head-gap:  clamp(10px, 2.6vmin, 48px);
   --story-title-w: clamp(190px, 22vmin, 520px);
   --story-lead-size: clamp(14px, 0.6rem + 0.6vw, 18px);
   --story-lead-line:  1.8;
@@ -1180,6 +1176,24 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
   --story-pad-x: clamp(16px, 4vw, 80px);
   --story-pad-t: clamp(24px, 6vmin, 140px);
   --story-gap:   clamp(16px, 3vmin, 48px);
+  --story-equal-gap: clamp(25px, 2.8vmin, 65px);
+  --story-head-gap: clamp(10px, 2.6vmin, 32px);
+}
+#story .story-head{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--story-head-gap);
+  margin-block: var(--story-equal-gap);
+  text-align: center;
+}
+
+#story .story-head .story-title{ margin: 0; }
+#story .story-head .story-lead { margin: 0; }
+#story .story-back{ margin: 0 auto 0; }
+#story .story-banner{ margin-top: 0; }
+#story .story-wrap{
+  row-gap: 0;
 }
 
 #story .story-back{
@@ -1282,7 +1296,6 @@ body.show-intro #intro a.intro-story::after,
 
 /*GALLERY: 이미지 배너 헤더 */
 :root{
-  --gallery-banner-h: clamp(120px, 10vh, 450px);
   --gallery-banner-top: clamp(0.5rem, 1.2vw, 1.2rem);
   --gallery-banner-bottom: clamp(2rem, 4vw, 6rem);
   --gallery-grid-top: 0rem;
@@ -1298,9 +1311,8 @@ body.show-intro #intro a.intro-story::after,
   padding: 0;
 }
 #gallery .gallery-banner img{
-  height: var(--gallery-banner-h); 
-  width: auto;
-  max-width: none;
+  width: 85vw;
+  height: auto;
   object-fit: contain;
   display: block;
   margin-left: 0;
@@ -1802,15 +1814,15 @@ img, svg {
 </button>
 
     <!-- 타이틀 -->
-<h2 class="story-title">
-  <img src="images/story-title.png" alt="Ouvriers" class="story-title-img">
-</h2>
-
-    <!-- 짤막한 글 -->
+  <div class="story-head" role="group" aria-label="Story heading">
+    <h2 class="story-title">
+      <img src="images/story-title.png" alt="Ouvriers" class="story-title-img">
+    </h2>
     <p class="story-lead">
-보편의 시간을 견딘 이들에게도, 아름다움은 배제되지 않는 규범이 됩니다.<br>
-테크니컬과 클래식의 질서가 겹쳐<br>차분하지만 선명한 존재감을 만듭니다.
+      보편의 시간을 견딘 이들에게도, 아름다움은 배제되지 않는 규범이 됩니다.<br>
+      테크니컬과 클래식의 질서가 겹쳐<br>차분하지만 선명한 존재감을 만듭니다.
     </p>
+  </div>
 
     <!-- 사진 배너 -->
 <figure class="story-banner">
