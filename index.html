@@ -5340,8 +5340,6 @@ const __w = [800, 1200, 1600, 2000];
 
   centerCreditToHero?.();
   layoutLookPanel();
-  try { window.resolveLookCollision?.({ allowBackoff: false }); } catch(_){}
-  requestAnimationFrame(() => { try { window.resolveLookCollision?.({ allowBackoff: true }); } catch(_){} });
  const credit = document.getElementById('credit');
  if (credit) credit.style.visibility = 'hidden';
 }
@@ -5489,8 +5487,6 @@ await ensureDecoded(show, 360);
         lockStackSize(false);
         layoutLookPanel();
         try { centerCreditToHero(); } catch(_){}
-  try { window.resolveLookCollision?.({ allowBackoff: false }); } catch(_){}
-  requestAnimationFrame(() => { try { window.resolveLookCollision?.({ allowBackoff: true }); } catch(_){} });
       });
     }
   } finally {
@@ -5607,84 +5603,7 @@ function layoutLookPanel(){
 
   document.documentElement.style
     .setProperty('--look-panel-left', Math.round(left) + 'px');
-  try { window.resolveLookCollision?.({ allowBackoff: true }); } catch(_){}
 }
-
-(() => {
-  const CFG = {
-    startLeftPct: 68,   //
-    minLeftPct:   60,   //
-    gutter:       16,   //
-    screenPad:    16,   //
-    tolerance:     6,   //
-    hysteresis:   12    //
-  };
-
-  const docEl = document.documentElement;
-  const getLeftPct = () => {
-    const v = getComputedStyle(document.querySelector('#look .image-container')).left;
-    const m = String(v).match(/([\d.]+)%/);
-    return m ? parseFloat(m[1]) : CFG.startLeftPct;
-  };
-  const setLeftPct = (pct) => {
-    docEl.style.setProperty('--look-image-left', `${pct}%`);
-  };
-
-  const vw = () => window.innerWidth || document.documentElement.clientWidth || 1920;
-  const pctToPx = (pct) => (pct / 100) * vw();
-  const pxToPct = (px)  => (px / vw()) * 100;
-
-  let rafId = 0;
-  function resolveLookCollisionStable({ allowBackoff = true } = {}) {
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(() => {
-      rafId = 0;
-
-      const look = document.getElementById('look');
-      const panel = document.getElementById('right-panel');
-      const vis = look?.querySelector('.look-img.is-visible') || document.getElementById('lookImgA') || document.getElementById('lookImgB');
-      if (!look || look.hidden || !panel || !vis) return;
-
-      const imgRect   = vis.getBoundingClientRect();
-      const panelRect = panel.getBoundingClientRect();
-      const Vw        = vw();
-
-      const nominalLeftPx = (CFG.startLeftPct / 100) * Vw;
-      const needLeftPx = Math.max(
-        imgRect.right + CFG.gutter,
-        Vw - (panelRect.width + CFG.screenPad)
-      );
-
-      const minPx = (CFG.minLeftPct   / 100) * Vw;
-      const maxPx = (CFG.startLeftPct / 100) * Vw;
-      const targetPx = Math.min(Math.max(needLeftPx, minPx), maxPx);
-
-      const curPct = getLeftPct();
-      const curPx  = pctToPx(curPct);
-
-      const diff = Math.round(targetPx - curPx);
-      if (Math.abs(diff) < CFG.tolerance) return;
-
-      let finalPx = targetPx;
-      if (allowBackoff && curPx < nominalLeftPx) {
-        const gap = panelRect.left - (imgRect.right);
-        if (gap >= (CFG.gutter + CFG.hysteresis)) {
-          finalPx = Math.min(nominalLeftPx, targetPx + CFG.tolerance);
-        }
-      }
-
-      setLeftPct( pxToPct(finalPx) );
-    });
-  }
-
-  window.resolveLookCollision = resolveLookCollisionStable;
-
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => requestAnimationFrame(() => window.resolveLookCollision({ allowBackoff: true }))).catch(()=>{});
-  }
-  const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn.apply(null, a), ms); }; };
-  window.addEventListener('resize', debounce(() => window.resolveLookCollision({ allowBackoff: true }), 120));
-})();
 
 (() => {
   const lookSec = document.getElementById('look');
