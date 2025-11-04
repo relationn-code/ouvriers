@@ -789,6 +789,8 @@ transform: translate(-3px,10px);
   --logo-top: 50px;
   --logo-left: 58px;
   --look-image-left: 68%;
+  --look-image-left-base: 68%;
+  --look-image-left: var(--look-image-left-base);
 }
 
 .site-logo{
@@ -902,6 +904,8 @@ transform: translateX(calc(-57% + var(--sb-comp, 0px)));
   max-width: 360px;
   text-align: left;
   z-index: 2;
+  word-break: keep-all;
+  white-space: normal;
 }
 
 
@@ -5589,39 +5593,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function layoutLookPanel(){
   const lookSec = document.getElementById('look');
-  const panel = document.getElementById('right-panel');
-  const cta   = document.getElementById('detail-cta');
-  const vis   = lookSec?.querySelector('.look-img.is-visible') 
-             || document.getElementById('lookImgA') 
-             || document.getElementById('lookImgB');
+  const panel   = document.getElementById('right-panel');
+  const cta     = document.getElementById('detail-cta');
+  const vis     = lookSec?.querySelector('.look-img.is-visible') 
+               || document.getElementById('lookImgA') 
+               || document.getElementById('lookImgB');
   if (!panel || !cta || !vis) return;
 
-  const panelW    = Math.ceil(panel.offsetWidth || 360);
   const vw        = window.innerWidth;
-  const gutter    = 24;
-  const screenPad = 16;
+  const gutter    = 50;
+  const rightSafe = 1;
+  const root      = document.documentElement;
 
-  let imgRect = vis.getBoundingClientRect();
-  let nominal = vw * 0.68 + 280;
-  let left    = Math.max(imgRect.right + gutter, nominal);
+  const baseLeft = (getComputedStyle(root).getPropertyValue('--look-image-left-base').trim()) || '68%';
+  root.style.setProperty('--look-image-left', baseLeft);
+  void vis.getBoundingClientRect();
 
-  if (left + panelW + screenPad > vw) {
-    resolveLookCollisionByImageShift({ panelW, vw, gutter, pad: screenPad });
+  let panelW = Math.round(panel.getBoundingClientRect().width || 360);
+  let left   = vw - panelW - rightSafe;
 
-    const vis2 = lookSec?.querySelector('.look-img.is-visible') 
-              || document.getElementById('lookImgA') 
-              || document.getElementById('lookImgB');
-    imgRect = (vis2 ? vis2.getBoundingClientRect() : imgRect);
-    nominal = vw * 0.68 + 280; // 동일 공식 유지
-    left    = Math.max(imgRect.right + gutter, nominal);
+  const collide = () => {
+    const r = vis.getBoundingClientRect();
+    const minLeft = Math.round(r.right + gutter);
+    return left < minLeft;
+  };
+
+  const candidates = [baseLeft,'66%','64%','62%','60%','58%','56%'].filter((v,i,a)=>a.indexOf(v)===i);
+  for (const pct of candidates) {
+    root.style.setProperty('--look-image-left', pct);
+    void vis.getBoundingClientRect();
+    left = vw - panelW - rightSafe;
+    if (!collide()) break;
   }
 
-  if (left + panelW + screenPad > vw) {
-    left = Math.max(screenPad, vw - panelW - screenPad);
-  }
+const imgRect = vis.getBoundingClientRect();
+const minLeft = Math.round(imgRect.right + gutter);
+const maxLeft = vw - panelW - rightSafe; 
 
-  document.documentElement.style
-    .setProperty('--look-panel-left', Math.round(left) + 'px');
+left = Math.min(maxLeft, minLeft);
+
+root.style.setProperty('--look-panel-left', left + 'px');
 }
 
 (() => {
