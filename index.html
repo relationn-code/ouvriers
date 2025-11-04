@@ -5612,78 +5612,78 @@ function layoutLookPanel(){
 
 (() => {
   const CFG = {
-    startLeft: 68,
-    minLeft: 60,
-    step: 2,
-    gutter: 16,
-    hysteresis: 8,
-    maxStepsPerCall: 4
+    startLeftPct: 68,   //
+    minLeftPct:   60,   //
+    gutter:       16,   //
+    screenPad:    16,   //
+    tolerance:     6,   //
+    hysteresis:   12    //
   };
 
   const docEl = document.documentElement;
-  const getLeft = () => {
-    const v = docEl.style.getPropertyValue('--look-image-left') || getComputedStyle(document.querySelector('#look .image-container')).left;
-    const m = String(v).match(/([\d.]+)%/); 
-    return m ? parseFloat(m[1]) : CFG.startLeft;
+  const getLeftPct = () => {
+    const v = getComputedStyle(document.querySelector('#look .image-container')).left;
+    const m = String(v).match(/([\d.]+)%/);
+    return m ? parseFloat(m[1]) : CFG.startLeftPct;
   };
-  const setLeft = (p) => docEl.style.setProperty('--look-image-left', `${p}%`);
-  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+  const setLeftPct = (pct) => {
+    docEl.style.setProperty('--look-image-left', `${pct}%`);
+  };
 
-  function measure() {
-    const look = document.getElementById('look');
-    if (!look || look.hidden) return null;
+  const vw = () => window.innerWidth || document.documentElement.clientWidth || 1920;
+  const pctToPx = (pct) => (pct / 100) * vw();
+  const pxToPct = (px)  => (px / vw()) * 100;
 
-    const img = look.querySelector('.look-img.is-visible') || document.getElementById('lookImgA') || document.getElementById('lookImgB');
-    const panel = document.getElementById('right-panel');
-    if (!img || !panel) return null;
+  let rafId = 0;
+  function resolveLookCollisionStable({ allowBackoff = true } = {}) {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      rafId = 0;
 
-    const imgRect = img.getBoundingClientRect();
-    const panelRect = panel.getBoundingClientRect();
-    return { imgRect, panelRect };
-  }
+      const look = document.getElementById('look');
+      const panel = document.getElementById('right-panel');
+      const vis = look?.querySelector('.look-img.is-visible') || document.getElementById('lookImgA') || document.getElementById('lookImgB');
+      if (!look || look.hidden || !panel || !vis) return;
 
-  function isColliding({ imgRect, panelRect }) {
-    return (imgRect.right + CFG.gutter) > panelRect.left;
-  }
+      const imgRect   = vis.getBoundingClientRect();
+      const panelRect = panel.getBoundingClientRect();
+      const Vw        = vw();
 
-  function resolveLookCollision({ allowBackoff = true } = {}) {
-    const pack = measure();
-    if (!pack) return;
-    let { imgRect, panelRect } = pack;
+      const nominalLeftPx = (CFG.startLeftPct / 100) * Vw;
+      const needLeftPx = Math.max(
+        imgRect.right + CFG.gutter,
+        Vw - (panelRect.width + CFG.screenPad)
+      );
 
-    let left = getLeft();
-    let steps = 0;
+      const minPx = (CFG.minLeftPct   / 100) * Vw;
+      const maxPx = (CFG.startLeftPct / 100) * Vw;
+      const targetPx = Math.min(Math.max(needLeftPx, minPx), maxPx);
 
-    while (isColliding({ imgRect, panelRect }) && left > CFG.minLeft && steps < CFG.maxStepsPerCall) {
-      left = clamp(left - CFG.step, CFG.minLeft, CFG.startLeft);
-      setLeft(left);
-      steps += 1;
-      const m = measure();
-      if (!m) break;
-      imgRect = m.imgRect; panelRect = m.panelRect;
-    }
+      const curPct = getLeftPct();
+      const curPx  = pctToPx(curPct);
 
-    if (allowBackoff && left < CFG.startLeft) {
-      const gap = panelRect.left - (imgRect.right);
-      if (gap >= (CFG.gutter + CFG.hysteresis)) {
-        const up = clamp(left + CFG.step, CFG.minLeft, CFG.startLeft);
-        if (up !== left) setLeft(up);
+      const diff = Math.round(targetPx - curPx);
+      if (Math.abs(diff) < CFG.tolerance) return;
+
+      let finalPx = targetPx;
+      if (allowBackoff && curPx < nominalLeftPx) {
+        const gap = panelRect.left - (imgRect.right);
+        if (gap >= (CFG.gutter + CFG.hysteresis)) {
+          finalPx = Math.min(nominalLeftPx, targetPx + CFG.tolerance);
+        }
       }
-    }
+
+      setLeftPct( pxToPct(finalPx) );
+    });
   }
 
-  window.resolveLookCollision = resolveLookCollision;
+  window.resolveLookCollision = resolveLookCollisionStable;
 
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => {
-      requestAnimationFrame(() => resolveLookCollision({ allowBackoff: true }));
-    }).catch(()=>{});
+    document.fonts.ready.then(() => requestAnimationFrame(() => window.resolveLookCollision({ allowBackoff: true }))).catch(()=>{});
   }
-
   const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn.apply(null, a), ms); }; };
-  window.addEventListener('resize', debounce(() => {
-    resolveLookCollision({ allowBackoff: true });
-  }, 120));
+  window.addEventListener('resize', debounce(() => window.resolveLookCollision({ allowBackoff: true }), 120));
 })();
 
 (() => {
