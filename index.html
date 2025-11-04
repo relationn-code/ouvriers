@@ -187,13 +187,6 @@ section[hidden] { display:none !important; pointer-events:none !important; }
     .right-panel span {
       font-weight: bold;
     }
-    .down-arrow {
-      position: absolute;
-      left: calc(68% + 323px);
-      bottom: 5vh;
-      font-size: 15px;
-      cursor: pointer;
-    }
 .detail-cta{
   position: absolute;
   left: var(--look-panel-left, calc(68% + 280px));
@@ -5575,27 +5568,53 @@ document.addEventListener('DOMContentLoaded', () => {
    credit.style.top  = top  + 'px';
  }
 
+  function resolveLookCollisionByImageShift({ panelW, vw, gutter = 24, pad = 16 }) {
+    const root = document.documentElement;
+    const candidates = ['68%', '66%', '64%', '62%', '60%', '58%'];
+    for (const pct of candidates) {
+      root.style.setProperty('--look-image-left', pct);
+
+      const vis =
+        document.querySelector('#look .look-img.is-visible') ||
+        document.getElementById('lookImgA') ||
+        document.getElementById('lookImgB');
+      if (!vis) break;
+
+      const r = vis.getBoundingClientRect();
+      const collide = (r.right + gutter + panelW + pad) > vw;
+      if (!collide) return pct;
+    }
+    return '58%';
+  }
+
 function layoutLookPanel(){
   const lookSec = document.getElementById('look');
-  if (!lookSec || lookSec.hidden) return;
-
   const panel = document.getElementById('right-panel');
   const cta   = document.getElementById('detail-cta');
-  const vis   = lookSec.querySelector('.look-img.is-visible') 
+  const vis   = lookSec?.querySelector('.look-img.is-visible') 
              || document.getElementById('lookImgA') 
              || document.getElementById('lookImgB');
   if (!panel || !cta || !vis) return;
 
-  const imgRect   = vis.getBoundingClientRect();
   const panelW    = Math.ceil(panel.offsetWidth || 360);
-
   const vw        = window.innerWidth;
   const gutter    = 24;
   const screenPad = 16;
 
-  const nominal   = vw * 0.68 + 280;
+  let imgRect = vis.getBoundingClientRect();
+  let nominal = vw * 0.68 + 280;
+  let left    = Math.max(imgRect.right + gutter, nominal);
 
-  let left = Math.max(imgRect.right + gutter, nominal);
+  if (left + panelW + screenPad > vw) {
+    resolveLookCollisionByImageShift({ panelW, vw, gutter, pad: screenPad });
+
+    const vis2 = lookSec?.querySelector('.look-img.is-visible') 
+              || document.getElementById('lookImgA') 
+              || document.getElementById('lookImgB');
+    imgRect = (vis2 ? vis2.getBoundingClientRect() : imgRect);
+    nominal = vw * 0.68 + 280; // 동일 공식 유지
+    left    = Math.max(imgRect.right + gutter, nominal);
+  }
 
   if (left + panelW + screenPad > vw) {
     left = Math.max(screenPad, vw - panelW - screenPad);
